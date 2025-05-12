@@ -4,8 +4,64 @@
 #include <sstream>
 #include <cmath>
 
+
+
+
+
 namespace PolygonalLibrary
 {
+	
+	
+	
+	
+// TODO controllo su p, dentro la finzione o fuori?
+bool valorizza_poliedro(int q, PolygonalMesh& mesh){
+	
+	if (q==3){
+		//Cell0Ds
+		mesh.NumCell0Ds=4;
+		mesh.Cell0DsId = {0,1,2,3}; // è efficiente? reserve?
+		mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
+		
+		mesh.Cell0DsCoordinates.col(0) << 1.0, 1.0, 1.0;
+		mesh.Cell0DsCoordinates.col(1) << -1.0, -1.0, 1.0;
+		mesh.Cell0DsCoordinates.col(2) << -1.0, 1.0, -1.0;
+		mesh.Cell0DsCoordinates.col(3) << 1.0, -1.0, -1.0;
+
+		//Cell1Ds
+		mesh.NumCell1Ds=6;
+		mesh.Cell1DsId = {0,1,2,3,4,5}; // è efficiente? reserve? Vanno ordinati?
+		
+		mesh.Cell1DsExtrema = Eigen::MatrixXi(2, mesh.NumCell1Ds);
+		mesh.Cell1DsExtrema.col(0) << 0, 1 ;
+		mesh.Cell1DsExtrema.col(1) << 0, 2 ;
+		mesh.Cell1DsExtrema.col(2) << 0, 3 ;
+		mesh.Cell1DsExtrema.col(3) << 1, 2 ;
+		mesh.Cell1DsExtrema.col(4) << 1, 3 ;
+		mesh.Cell1DsExtrema.col(5) << 2, 3 ;
+		
+		//Cell2Ds
+		mesh.NumCell2Ds = 4;
+		mesh.Cell2DsId = {0, 1 ,2, 3};
+		mesh.Cell2DsNumVert = {3, 3, 3, 3};
+		mesh.Cell2DsNumEdg = {3, 3, 3, 3};
+		
+		}
+	else if (q==4){
+		
+	}
+	else if (q==5){
+	}
+	else{
+		cerr<<"valore di q non valido"<<endl;
+		return false;
+	}
+	
+	
+}
+
+
+
 bool ImportMesh(PolygonalMesh& mesh)
 {
 
