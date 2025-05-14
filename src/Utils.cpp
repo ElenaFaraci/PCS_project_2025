@@ -46,6 +46,29 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		mesh.Cell2DsNumVert = {3, 3, 3, 3};
 		mesh.Cell2DsNumEdg = {3, 3, 3, 3};
 		
+		
+		mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); // serve davvero?
+		
+		vector<unsigned int> v1 = {0,1,2};
+		vector<unsigned int> v2 = {1,2,3};
+		vector<unsigned int> v3 = {0,2,3};
+		vector<unsigned int> v4 = {0,1,3};
+		
+		mesh.Cell2DsVertices= {v1, v2, v3, v4};
+		
+		mesh.Cell2DsEdges.reserve(mesh.NumCell2Ds);
+		
+		vector<unsigned int> v1 = {0,3,1};
+		vector<unsigned int> v2 = {3,4,5};
+		vector<unsigned int> v3 = {1,2,5};
+		vector<unsigned int> v4 = {0,4,2};
+		
+		mesh.Cell2DsEdges = {v1, v2, v3, v4};
+		
+		//Cell3Ds
+		
+		
+		
 		}
 	else if (q==4){
 		
