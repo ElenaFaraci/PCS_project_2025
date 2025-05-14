@@ -3,7 +3,13 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
-
+/*
+SCALETTA:
+main, cmake, gitignore, finire poliedri (questa settimana)
+triangolazione
+duale proiezione
+punto 2
+*/
 
 
 
@@ -23,10 +29,10 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		mesh.Cell0DsId = {0,1,2,3}; // è efficiente? reserve?
 		mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
 		
-		mesh.Cell0DsCoordinates.col(0) << 1.0, 1.0, 1.0;
-		mesh.Cell0DsCoordinates.col(1) << -1.0, -1.0, 1.0;
-		mesh.Cell0DsCoordinates.col(2) << -1.0, 1.0, -1.0;
-		mesh.Cell0DsCoordinates.col(3) << 1.0, -1.0, -1.0;
+		mesh.Cell0DsCoordinates.col(0) << 1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3);
+		mesh.Cell0DsCoordinates.col(1) << -1.0/sqrt(3), -1.0/sqrt(3), 1.0/sqrt(3);
+		mesh.Cell0DsCoordinates.col(2) << -1.0/sqrt(3), 1.0/sqrt(3), -1.0/sqrt(3);
+		mesh.Cell0DsCoordinates.col(3) << 1.0/sqrt(3), -1.0/sqrt(3), -1.0/sqrt(3);
 
 		//Cell1Ds
 		mesh.NumCell1Ds=6;
@@ -59,14 +65,22 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		mesh.Cell2DsEdges.reserve(mesh.NumCell2Ds);
 		
 		vector<unsigned int> v1 = {0,3,1};
-		vector<unsigned int> v2 = {3,4,5};
-		vector<unsigned int> v3 = {1,2,5};
+		vector<unsigned int> v2 = {3,5,4};
+		vector<unsigned int> v3 = {1,5,2};
 		vector<unsigned int> v4 = {0,4,2};
 		
 		mesh.Cell2DsEdges = {v1, v2, v3, v4};
 		
 		//Cell3Ds
+		mesh.Cell3DsId=0; //caso tetraedro
 		
+		mesh.Cell3DsNumVert = mesh.NumCell0Ds;
+		mesh.Cell3DsNumEdg = mesh.NumCell1Ds;
+		mesh.Cell3DsNumFaces = mesh.NumCell2Ds;
+		
+		Cell3DsVertices = mesh.Cell0DsId; //costruttore di copia? 
+		Cell3DsEdges = mesh.Cell1DsId;
+		Cell3DsFaces = mesh.Cell2DsId
 		
 		
 		}
@@ -82,6 +96,47 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 	
 	
 }
+
+
+bool controllo_lati_vertici (const PolygonalMesh& mesh){
+	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
+		for (unsigned int j=0; j<(mesh.Cell2DsEdges[i]).size(); j++){
+			
+			unsigned int id_vertice = mesh.Cell2DsVertices[i][j];
+			unsigned int id_lato=mesh.Cell2DsEdges[i][j];
+			unsigned int id_lato_succ=mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
+			unsigned int count =0;
+			
+			//Controllo Lati
+			if (mesh.Cell1DsExtrema(0,id_lato)=mesh.Cell1DsExtrema(0,id_lato_succ))
+				count++;
+			if (mesh.Cell1DsExtrema(0,id_lato)=mesh.Cell1DsExtrema(1,id_lato_succ))
+				count++;
+			if (mesh.Cell1DsExtrema(1,id_lato)=mesh.Cell1DsExtrema(0,id_lato_succ))
+				count++;
+			if (mesh.Cell1DsExtrema(1,id_lato)=mesh.Cell1DsExtrema(1,id_lato_succ))
+				count++;
+			
+			if (count != 1){
+				return false;
+			}
+			
+			// Controllo Vertici
+			if (id_vertice == mesh.Cell1DsExtrema(0,id_lato))
+				count++;
+			if (id_vertice == mesh.Cell1DsExtrema(1,id_lato))
+				count++;
+			
+			if (count != 2)
+				return false;
+			
+			
+		}
+			
+	}
+	return true;
+}
+
 
 
 

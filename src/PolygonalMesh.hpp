@@ -36,15 +36,25 @@ struct PolygonalMesh
 	// std::map<unsigned int, list<unsigned int>> MarkerCell2Ds = {};
 	
 	//Cell3D
-	unsigned int NumCell3Ds = 0;
-	
+	unsigned int NumCell3Ds = 1;
+	unsigned int Cell3DsId; //(0=tetraedro, 1= ...)
+	/* alternativa, con id specifico per ogni poliedro 
 	std::vector<unsigned int> Cell3DsNumVert = {}; // indica il numero di vertici del poliedro identificato dalla posizione in questo vettore
 	std::vector<unsigned int> Cell3DsNumEdg = {};
 	std::vector<unsigned int> Cell3DsNumFaces = {};
+	*/
+	unsigned int Cell3DsNumVert =0;
+	unsigned int Cell3DsNumEdg =0;
+	unsigned int Cell3DsNumFaces =0;
 	
+	/*
 	std::vector<vector<unsigned int>> Cell3DsVertices = {}; 
     std::vector<vector<unsigned int>> Cell3DsEdges = {}; 
 	std::vector<vector<unsigned int>> Cell3DsFaces = {}; 
+	*/
+	vector<unsigned int> Cell3DsVertices = {};
+	vector<unsigned int> Cell3DsEdges = {};
+	vector<unsigned int> Cell3DsFaces = {};
 	
 	
 };
