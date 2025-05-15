@@ -1,10 +1,19 @@
-list(APPEND polygonalMesh_headers ${CMAKE_CURRENT_SOURCE_DIR}/Utils.hpp)
-list(APPEND polygonalMesh_sources ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp)
+# message("SUBFOLDER:")
 
-list(APPEND polygonalMesh_headers ${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh.hpp)
+# message(${CMAKE_SOURCE_DIR})
+# message(${CMAKE_CURRENT_SOURCE_DIR})
+# message(${CMAKE_BINARY_DIR})
+# message(${CMAKE_CURRENT_BINARY_DIR})
+# message(${PROJECT_NAME})
+# message(${CMAKE_PROJECT_NAME})
 
-list(APPEND polygonalMesh_includes ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh.hpp)
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Utils.hpp)
 
-set(polygonalMesh_sources ${polygonalMesh_sources} PARENT_SCOPE)
-set(polygonalMesh_headers ${polygonalMesh_headers} PARENT_SCOPE)
-set(polygonalMesh_includes ${polygonalMesh_includes} PARENT_SCOPE)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp)
+
+list(APPEND src_includes ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(src_headers ${src_headers} PARENT_SCOPE)
+set(src_sources ${src_sources} PARENT_SCOPE)
+set(src_includes ${src_includes} PARENT_SCOPE)
