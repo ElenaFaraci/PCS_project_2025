@@ -139,7 +139,7 @@ bool controllo_lati_vertici (const PolygonalMesh& mesh){
 
 
 
-
+/*
 bool ImportMesh(PolygonalMesh& mesh)
 {
 
@@ -459,6 +459,6 @@ bool test_marker(const PolygonalMesh& mesh){
 	}
 	return true;
 }
-
+*/
 
 }
