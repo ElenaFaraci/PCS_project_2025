@@ -12,7 +12,7 @@ namespace PolygonalLibrary
 /// return the result of the reading, true if is success, false otherwise
 bool valorizza_poliedro(int q, PolygonalMesh& mesh);
 
-bool controllo_lati_vertici (const PolygonalMesh& mesh)
+bool controllo_lati_vertici (const PolygonalMesh& mesh);
 
 /// Import the Cell0D properties from Cell0Ds.csv file
 /// mesh: a TriangularMesh struct
