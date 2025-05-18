@@ -141,12 +141,12 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		
 		vector<unsigned int> e1 = {0,4,1};
 		vector<unsigned int> e2 = {1,7,2};
-		vector<unsigned int> e3 = {2,3,9};
+		vector<unsigned int> e3 = {2,9,3};
 		vector<unsigned int> e4 = {0,5,3};
-		vector<unsigned int> e5 = {6,5,11};
-		vector<unsigned int> e6 = {10,9,11};
-		vector<unsigned int> e7 = {8,7,10};
-		vector<unsigned int> e8 = {6,4,8};
+		vector<unsigned int> e5 = {6,4,8};
+		vector<unsigned int> e6 = {8,7,10};
+		vector<unsigned int> e7 = {10,9,11};
+		vector<unsigned int> e8 = {5,11,6};
 		
 		mesh.Cell2DsEdges = {e1, e2, e3, e4, e5, e6, e7, e8};
 		
@@ -260,26 +260,26 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		
 		mesh.Cell2DsEdges.reserve(mesh.NumCell2Ds);
 		
-		vector<unsigned int> e1 = {19,1,3};
-		vector<unsigned int> e2 = {0,1,10};
+		vector<unsigned int> e1 = {1,19,3};
+		vector<unsigned int> e2 = {0,10,1};
 		vector<unsigned int> e3 = {10,20,13};
-		vector<unsigned int> e4 = {25,20,18};
-		vector<unsigned int> e5 = {24,18,19};
-		vector<unsigned int> e6 = {15,7,5};
-		vector<unsigned int> e7 = {9,7,25};
-		vector<unsigned int> e8 = {24,15,16};
-		vector<unsigned int> e9 = {17,16,28};
-		vector<unsigned int> e10 = {3,4,28};
-		vector<unsigned int> e11 = {4,2,27};
-		vector<unsigned int> e12 = {11,12,26};
-		vector<unsigned int> e13 = {12,13,29};
-		vector<unsigned int> e14 = {8,9,29};
-		vector<unsigned int> e15 = {6,8,22};
-		vector<unsigned int> e16 = {21,22,26};
-		vector<unsigned int> e17 = {5,6,14};
-		vector<unsigned int> e18 = {14,17,23};
-		vector<unsigned int> e19 = {21,23,27};
-		vector<unsigned int> e20 = {0,2,11};
+		vector<unsigned int> e4 = {18,25,20};
+		vector<unsigned int> e5 = {18,24,19};
+		vector<unsigned int> e6 = {5,15,7};
+		vector<unsigned int> e7 = {7,25,9};
+		vector<unsigned int> e8 = {15,24,16};
+		vector<unsigned int> e9 = {16,28,17};
+		vector<unsigned int> e10 = {3,28,4};
+		vector<unsigned int> e11 = {2,27,4};
+		vector<unsigned int> e12 = {11,26,12};
+		vector<unsigned int> e13 = {12,29,13};
+		vector<unsigned int> e14 = {8,29,9};
+		vector<unsigned int> e15 = {6,22,8};
+		vector<unsigned int> e16 = {21,26,22};
+		vector<unsigned int> e17 = {5,14,6};
+		vector<unsigned int> e18 = {14,23,17};
+		vector<unsigned int> e19 = {21,27,23};
+		vector<unsigned int> e20 = {0,11,4};
 		
 		mesh.Cell2DsEdges = {e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20};
 		
