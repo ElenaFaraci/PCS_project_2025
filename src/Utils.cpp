@@ -348,9 +348,68 @@ bool controllo_lati_vertici (const PolygonalMesh& mesh){
 	}
 	return true;
 }
+/////////////////////////////////////////////////////////////////////////////////////////
+// Prove triangolazione
+string ArrayToString(const size_t& n, const double* const& v)
+{
+    string str;
+    ostringstream toString;
+    toString << "[ ";
+    for (unsigned int i = 0; i < n; i++)
+        toString<< v[i]<< " ";
+    toString << "]";
 
+    return toString.str();
+}
 
+/*
+Eigen::VectorXd crea_vertice(unsigned int id_1, unsigned int id_2, 
+				  unsigned int step, unsigned int id_start,
+				  unsigned int b, const PolygonalMesh& mesh){
+	// restituisce le coordinate del nuovo punto 
+	Eigen::VectorXd point_1 = mesh.Cell0DsCoordinates.col(id_1);
+	Eigen::VectorXd point_2 = mesh.Cell0DsCoordinates.col(id_2);
+	Eigen::VectorXd point_s = mesh.Cell0DsCoordinates.col(id_start);
+	
+	Eigen::VectorXd new_point=(point_2-point_1)*((double)step/b)+point_s;
+	
+	    if (new_point.size() != 3) {
+        std::cerr << "Errore: la colonna non ha 3 elementi.\n";
+        //return 1;
+    }
 
+    std::array<double, 3> arr;
+    for (int i = 0; i < 3; ++i) {
+        arr[i] = new_point(i);
+    }
+	
+		
+	cout<<ArrayToString(3,&arr[0])<<endl;
+	
+	return new_point;
+	
+	
+}
+
+bool triangolazione(PolygonalMesh& mesh){
+	f=0; id faccia
+	
+	
+	
+	
+	// ciò che segue sarà inglobato in un for su b, b andrà a decrescere
+	
+	mesh.Cell0DsCoordinates.conservativeResize(3, mesh.NumCell0Ds+(2*b-1));
+	mesh.Cell0DsCoordinates.col(mesh.NumCell0Ds)=crea_vertice(...TODO...)
+	for (i=0; i<b-1;i++){
+		
+	}
+	mesh.NumCell0Ds+=(2*b-1);
+	
+	return true;
+	
+}
+*/
 
 
 }
