@@ -361,7 +361,55 @@ string ArrayToString(const size_t& n, const double* const& v)
 
     return toString.str();
 }
+Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int id0, unsigned int b, unsigned int step, const PolygonalMesh& mesh){
+	Eigen::Vector3d vertex1 = mesh.Cell0DsCoordinates.col(id1);
+	Eigen::Vector3d vertex2 = mesh.Cell0DsCoordinates.col(id2);
+	Eigen::Vector3d vertex0 = mesh.Cell0DsCoordinates.col(id0);
+	Eigen::Vector3d new_vertex = (vertex2 - vertex1) * ((double)step/b) + vertex0;
+	cout << "Coordinate del nuovo vertice: " << new_vertex.transpose() << endl;
+    return new_vertex;
+}
+bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
+	unsigned int k = mesh.NumCell0Ds;
+	for(j = 0; j < mesh.NumCell2Ds; j ++){
+		unsigned int x0 = mesh.Cell2DsVertices[j][0];
+		unsigned int y0 = mesh.Cell2DsVertices[j][1];
+		unsigned int z0 = mesh.Cell2DsVertices[j][2];
+		
+		unsigned int x = x0;
+		unsigned int y = y0;
+		unsigned int z = z0;
+		unsigned int num_suddivisioni = b;
+		for(unsigned int w = 0; w < b-1; w++){
+			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
+				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
+				mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
+				k ++;
+			}
+			num_suddivisioni --;
+			x = Nuovo_Vertice(x0, z0, x0, b, w + 1, mesh);
+			y = Nuovo_Vertice(y0, z0, y0, b, w + 1, mesh);
+			mesh.Cell0DsCoordinates.col(k) = x;
+			k = k + 1;
+			mesh.Cell0DsCoordinates.col(k) = y;
+			k = k + 1;
+			
+		}
+		
+}
+	
+	/*const unsigned int new_vertex = 2 * num_suddivisioni - 1;
+    const unsigned int start_index = mesh.NumCell0Ds;
 
+    mesh.Cell0DsCoordinates.conservativeResize(3, start_index + new_vertex);
+	 for (unsigned int i = 0; i < new_vertex; ++i) {
+		 double step_ratio = double(i) / (new_vertex);
+		  mesh.Cell0DsCoordinates.col(start_index + i) = Nuovo_Vertice(0, 1, 0, step_ratio, mesh);
+}
+	mesh.NumCell0Ds += new_vertices;
+	return true;
+*/
+}
 /*
 Eigen::VectorXd crea_vertice(unsigned int id_1, unsigned int id_2, 
 				  unsigned int step, unsigned int id_start,
