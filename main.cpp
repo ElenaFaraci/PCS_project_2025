@@ -31,6 +31,10 @@ int main(){
 	
 	bool f= Triangolazione(mesh, 3);
 	
+	for (int i=0;i<20;i++){
+		cout<<mesh.Cell0DsCoordinates.col(i).transpose()<<endl;
+	}
+	
 
 
 	

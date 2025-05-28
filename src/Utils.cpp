@@ -377,6 +377,7 @@ int Esiste_gia(PolygonalMesh& mesh,
     for (int i = 0; i < k; ++i) {
         if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
             return i; // vertice esistente trovato
+			cout<<"duplicato del vertice: "<<i<<endl;
         }
     }
     return -1; // non trovato
@@ -399,7 +400,7 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
           << mesh.Cell0DsCoordinates.cols() << std::endl;
 
 	
-	unsigned int num_suddivisioni = b;
+	
 	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
@@ -409,9 +410,13 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
 		unsigned int y = y0;
 		unsigned int z = z0;
 		
+		unsigned int num_suddivisioni = b;
+		
 		for(unsigned int w = 0; w < b-1; w++){
+			
 			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
 				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
+				
 				if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
