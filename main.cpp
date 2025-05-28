@@ -23,6 +23,45 @@ int main(){
 	if (!b){
 		cout<<"fallisce controllo"<<endl;
 	}
+	
+	
+	//Eigen::VectorXd prova= Nuovo_Vertice(0,1,0,3,1,mesh);
+	
+	
+	
+	bool f= Triangolazione(mesh, 3);
+	
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//////////////////////////////////////////////////////////
 	// stampe prova triangolazione
 	//mesh.Cell2DsVertices[0][0]

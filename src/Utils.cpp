@@ -369,9 +369,38 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int i
 	cout << "Coordinate del nuovo vertice: " << new_vertex.transpose() << endl;
     return new_vertex;
 }
+
+int Esiste_gia(PolygonalMesh& mesh,
+               const Eigen::Vector3d& nuovo_vertice,
+               unsigned int k) {				   
+	double epsilon = 1e-8;
+    for (int i = 0; i < k; ++i) {
+        if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
+            return i; // vertice esistente trovato
+        }
+    }
+    return -1; // non trovato
+}
+
+
+
+
+
 bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
 	unsigned int k = mesh.NumCell0Ds;
-	for(j = 0; j < mesh.NumCell2Ds; j ++){
+	cout<<k<<endl;
+	// inizio dal caso del tetraedro
+	unsigned int V=2*pow(b,2)+2; //da rivedere per il tipo che ritorna pow
+	cout<<V<<endl;
+	mesh.Cell0DsCoordinates.conservativeResize(3, V);
+	
+	cout << "Dimensioni Cell0DsCoordinates: " 
+          << mesh.Cell0DsCoordinates.rows() << " x " 
+          << mesh.Cell0DsCoordinates.cols() << std::endl;
+
+	
+	unsigned int num_suddivisioni = b;
+	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
 		unsigned int z0 = mesh.Cell2DsVertices[j][2];
@@ -379,85 +408,56 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
 		unsigned int x = x0;
 		unsigned int y = y0;
 		unsigned int z = z0;
-		unsigned int num_suddivisioni = b;
+		
 		for(unsigned int w = 0; w < b-1; w++){
 			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
 				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
-				mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
-				k ++;
+				if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
+					mesh.Cell0DsId.push_back(k);
+					cout<<mesh.Cell0DsId[k]<<endl;
+					k ++;
+				}
+				
+				
+				
+				//mesh.Cell0DsCoordinates.col(k) = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
+				
 			}
 			num_suddivisioni --;
-			x = Nuovo_Vertice(x0, z0, x0, b, w + 1, mesh);
-			y = Nuovo_Vertice(y0, z0, y0, b, w + 1, mesh);
-			mesh.Cell0DsCoordinates.col(k) = x;
-			k = k + 1;
-			mesh.Cell0DsCoordinates.col(k) = y;
-			k = k + 1;
+			// sto inserendo vertici duplicati
+			
+			Eigen::Vector3d nuovo_vertice= Nuovo_Vertice(x0, z0, x0, b, w + 1, mesh);
+			
+			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
+					mesh.Cell0DsId.push_back(k);
+					cout<<mesh.Cell0DsId[k]<<endl;
+					x=k;
+					k ++;
+				}
+			
+			
+			
+			nuovo_vertice = Nuovo_Vertice(y0, z0, y0, b, w + 1, mesh);
+			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
+					mesh.Cell0DsId.push_back(k);
+					cout<<mesh.Cell0DsId[k]<<endl;
+					y=k;
+					k ++;
+				}
+			
 			
 		}
 		
 }
-	
-	/*const unsigned int new_vertex = 2 * num_suddivisioni - 1;
-    const unsigned int start_index = mesh.NumCell0Ds;
-
-    mesh.Cell0DsCoordinates.conservativeResize(3, start_index + new_vertex);
-	 for (unsigned int i = 0; i < new_vertex; ++i) {
-		 double step_ratio = double(i) / (new_vertex);
-		  mesh.Cell0DsCoordinates.col(start_index + i) = Nuovo_Vertice(0, 1, 0, step_ratio, mesh);
-}
-	mesh.NumCell0Ds += new_vertices;
-	return true;
-*/
-}
-/*
-Eigen::VectorXd crea_vertice(unsigned int id_1, unsigned int id_2, 
-				  unsigned int step, unsigned int id_start,
-				  unsigned int b, const PolygonalMesh& mesh){
-	// restituisce le coordinate del nuovo punto 
-	Eigen::VectorXd point_1 = mesh.Cell0DsCoordinates.col(id_1);
-	Eigen::VectorXd point_2 = mesh.Cell0DsCoordinates.col(id_2);
-	Eigen::VectorXd point_s = mesh.Cell0DsCoordinates.col(id_start);
-	
-	Eigen::VectorXd new_point=(point_2-point_1)*((double)step/b)+point_s;
-	
-	    if (new_point.size() != 3) {
-        std::cerr << "Errore: la colonna non ha 3 elementi.\n";
-        //return 1;
-    }
-
-    std::array<double, 3> arr;
-    for (int i = 0; i < 3; ++i) {
-        arr[i] = new_point(i);
-    }
-	
-		
-	cout<<ArrayToString(3,&arr[0])<<endl;
-	
-	return new_point;
-	
-	
-}
-
-bool triangolazione(PolygonalMesh& mesh){
-	f=0; id faccia
-	
-	
-	
-	
-	// ciò che segue sarà inglobato in un for su b, b andrà a decrescere
-	
-	mesh.Cell0DsCoordinates.conservativeResize(3, mesh.NumCell0Ds+(2*b-1));
-	mesh.Cell0DsCoordinates.col(mesh.NumCell0Ds)=crea_vertice(...TODO...)
-	for (i=0; i<b-1;i++){
-		
-	}
-	mesh.NumCell0Ds+=(2*b-1);
-	
 	return true;
 	
 }
-*/
+
+
+
 
 
 }
