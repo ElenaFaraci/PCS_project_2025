@@ -366,16 +366,17 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int i
 	Eigen::Vector3d vertex2 = mesh.Cell0DsCoordinates.col(id2);
 	Eigen::Vector3d vertex0 = mesh.Cell0DsCoordinates.col(id0);
 	Eigen::Vector3d new_vertex = (vertex2 - vertex1) * ((double)step/b) + vertex0;
-	cout << "Coordinate del nuovo vertice: " << new_vertex.transpose() << endl;
+	//cout << "Coordinate del nuovo vertice: " << new_vertex.transpose() << endl;
     return new_vertex;
 }
 
 int Esiste_gia(PolygonalMesh& mesh,
                const Eigen::Vector3d& nuovo_vertice,
                unsigned int k) {				   
-	double epsilon = 1e-8;
+	double epsilon = 1e-11;
     for (int i = 0; i < k; ++i) {
         if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
+			cout<<"duplicato del vertice: "<<i<<endl;
             return i; // vertice esistente trovato
 			cout<<"duplicato del vertice: "<<i<<endl;
         }
@@ -387,17 +388,26 @@ int Esiste_gia(PolygonalMesh& mesh,
 
 
 
-bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
+bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigned int q){
+	unsigned int T = b*b+b*c+c*c;
+	unsigned int V = 0;
+	if (q==3){
+		V=2*T+2;
+	} else if (q==4){
+		V=4*T+2;
+	} else if (q==5){
+		V=10*T+2;
+	}
+	
+	//cout<<V<<endl;
 	unsigned int k = mesh.NumCell0Ds;
 	cout<<k<<endl;
-	// inizio dal caso del tetraedro
-	unsigned int V=2*pow(b,2)+2; //da rivedere per il tipo che ritorna pow
-	cout<<V<<endl;
+	
 	mesh.Cell0DsCoordinates.conservativeResize(3, V);
 	
 	cout << "Dimensioni Cell0DsCoordinates: " 
           << mesh.Cell0DsCoordinates.rows() << " x " 
-          << mesh.Cell0DsCoordinates.cols() << std::endl;
+          << mesh.Cell0DsCoordinates.cols() <<endl;
 
 	
 	
