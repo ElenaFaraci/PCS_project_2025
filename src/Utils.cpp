@@ -507,6 +507,17 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		cout<<punti_faccia[i]<<endl;
 	}
 	//di seguito andrò a creare le nuove facce e lati
+	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
+	
+	for (int i=0;i<mesh.Cell2DsVertices.size();i++){
+		for (int j=0;j<mesh.Cell2DsVertices[i].size();j++){
+			cout<<mesh.Cell2DsVertices[i][j]<<"; ";
+		}
+		cout<<endl;
+	}
+	
+	cout<<mesh.Cell2DsVertices.size()<<endl;
+	
 	
 	//alla fine aggiorno il num facce tutto della mesh
 }
@@ -514,9 +525,44 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,
 					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia){
 	
-	for (j=0;j<num_facc_pre, j++){
-		
+	//TODO: - vedere se effettivamente sto aggiungendo tutti i triangoli
+	//      - un po di efficienza.. pushback non mi piace senza resize
+	//		- eliminare le vecchie facce?
+	
+	unsigned int offset_faccia = 0;
+
+	for (unsigned int j = 0; j < num_facc_pre; j++) {
+		vector<unsigned int> inizio_strato(b + 1);
+		unsigned int pos = offset_faccia;
+		for (unsigned int r = 0; r <= b; r++) {
+			inizio_strato[r] = pos;
+			pos += b - r + 1;
+		}
+
+		for (unsigned int r = 0; r < b; r++) {
+			unsigned int base_r = inizio_strato[r];
+			unsigned int base_r1 = inizio_strato[r + 1];
+			unsigned int len_r = b - r + 1;
+
+			for (unsigned int k = 0; k < len_r - 1; k++) {
+				unsigned int a  = punti_faccia[base_r + k];
+				unsigned int b_ = punti_faccia[base_r + k + 1];
+				unsigned int c  = punti_faccia[base_r1 + k];
+				unsigned int d  = punti_faccia[base_r1 + k + 1];
+
+				// Triangolo 1
+				mesh.Cell2DsVertices.push_back({a, b_, c});
+
+				// Triangolo 2, solo se non siamo all'ultimo k (serve d)
+				if (k < len_r - 2) {
+					mesh.Cell2DsVertices.push_back({b_, d, c});
+				}
+			}
+		}
+
+		offset_faccia += num_nuovi_per_faccia;
 	}
+
 	
 }
 
