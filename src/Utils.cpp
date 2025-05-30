@@ -366,12 +366,52 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int i
 	Eigen::Vector3d vertex2 = mesh.Cell0DsCoordinates.col(id2);
 	Eigen::Vector3d vertex0 = mesh.Cell0DsCoordinates.col(id0);
 	Eigen::Vector3d new_vertex = (vertex2 - vertex1) * ((double)step/b) + vertex0;
-	cout << "Coordinate del nuovo vertice: " << new_vertex.transpose() << endl;
+	//cout << "Coordinate del nuovo vertice: " << new_vertex.transpose() << endl;
     return new_vertex;
 }
-bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
+
+int Esiste_gia(PolygonalMesh& mesh,
+               const Eigen::Vector3d& nuovo_vertice,
+               unsigned int k) {				   
+	double epsilon = 1e-11;
+    for (int i = 0; i < k; ++i) {
+        if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
+			cout<<"duplicato del vertice: "<<i<<endl;
+            return i; // vertice esistente trovato
+			cout<<"duplicato del vertice: "<<i<<endl;
+        }
+    }
+    return -1; // non trovato
+}
+
+
+
+
+
+bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigned int q){
+	unsigned int T = b*b+b*c+c*c;
+	unsigned int V = 0;
+	if (q==3){
+		V=2*T+2;
+	} else if (q==4){
+		V=4*T+2;
+	} else if (q==5){
+		V=10*T+2;
+	}
+	
+	//cout<<V<<endl;
 	unsigned int k = mesh.NumCell0Ds;
-	for(j = 0; j < mesh.NumCell2Ds; j ++){
+	cout<<k<<endl;
+	
+	mesh.Cell0DsCoordinates.conservativeResize(3, V);
+	
+	cout << "Dimensioni Cell0DsCoordinates: " 
+          << mesh.Cell0DsCoordinates.rows() << " x " 
+          << mesh.Cell0DsCoordinates.cols() <<endl;
+
+	
+	
+	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
 		unsigned int z0 = mesh.Cell2DsVertices[j][2];
@@ -379,24 +419,55 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
 		unsigned int x = x0;
 		unsigned int y = y0;
 		unsigned int z = z0;
+		
 		unsigned int num_suddivisioni = b;
+		
 		for(unsigned int w = 0; w < b-1; w++){
+			
 			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
 				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
-				mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
-				k ++;
+				
+				if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
+					mesh.Cell0DsId.push_back(k);
+					cout<<mesh.Cell0DsId[k]<<endl;
+					k ++;
+				}
+				
+				
+				
+				//mesh.Cell0DsCoordinates.col(k) = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
+				
 			}
 			num_suddivisioni --;
-			x = Nuovo_Vertice(x0, z0, x0, b, w + 1, mesh);
-			y = Nuovo_Vertice(y0, z0, y0, b, w + 1, mesh);
-			mesh.Cell0DsCoordinates.col(k) = x;
-			k = k + 1;
-			mesh.Cell0DsCoordinates.col(k) = y;
-			k = k + 1;
+			// sto inserendo vertici duplicati
+			
+			Eigen::Vector3d nuovo_vertice= Nuovo_Vertice(x0, z0, x0, b, w + 1, mesh);
+			
+			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
+					mesh.Cell0DsId.push_back(k);
+					cout<<mesh.Cell0DsId[k]<<endl;
+					x=k;
+					k ++;
+				}
+			
+			
+			
+			nuovo_vertice = Nuovo_Vertice(y0, z0, y0, b, w + 1, mesh);
+			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
+					mesh.Cell0DsId.push_back(k);
+					cout<<mesh.Cell0DsId[k]<<endl;
+					y=k;
+					k ++;
+				}
+			
 			
 		}
 		
 }
+<<<<<<< HEAD
 //funzione baricentro
 Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {
     Eigen::Vector3d b = Eigen::Vector3d::Zero();
@@ -517,10 +588,14 @@ bool triangolazione(PolygonalMesh& mesh){
 	}
 	mesh.NumCell0Ds+=(2*b-1);
 	
+=======
+>>>>>>> 413c43f3cbf97c3e2275a5b08f2d90205cb244d9
 	return true;
 	
 }
-*/
+
+
+
 
 
 }

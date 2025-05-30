@@ -1,7 +1,7 @@
 #include <iostream>
 #include "PolygonalMesh.hpp"
 #include "Utils.hpp"
-//#include "UCDUtilities.hpp"
+#include "UCDUtilities.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -11,18 +11,71 @@ using namespace PolygonalLibrary;
 int main(){
 	
 	PolygonalMesh mesh;
-	int q=3;
-	bool a= valorizza_poliedro(q, mesh);
+	int p=3; // per ora non consideriamo altri casi se non 3
+	int q=4;
+	int b=3;
+	int c=0;
 	
-	if (!a){
+	
+	if (!valorizza_poliedro(q, mesh)){
 		cout<<"errore valorizzazione"<<endl;
 	}
 	
-	bool b=controllo_lati_vertici (mesh);
 	
-	if (!b){
+	if (!controllo_lati_vertici (mesh)){
 		cout<<"fallisce controllo"<<endl;
+	}	
+		
+	
+	if (b==0 or c==0){
+		bool f= Triangolazione(mesh, b, c, q);
 	}
+	
+	
+	
+	
+
+	Gedim::UCDUtilities utilities;
+    {   
+        utilities.ExportPoints("./Cell0Ds.inp",
+                               mesh.Cell0DsCoordinates);
+    }
+
+    {
+        utilities.ExportSegments("./Cell1Ds.inp",
+                                 mesh.Cell0DsCoordinates,
+                                 mesh.Cell1DsExtrema,
+                                 {});
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//////////////////////////////////////////////////////////
 	// stampe prova triangolazione
 	//mesh.Cell2DsVertices[0][0]
