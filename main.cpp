@@ -12,8 +12,8 @@ int main(){
 	
 	PolygonalMesh mesh;
 	int p=3; // per ora non consideriamo altri casi se non 3
-	int q=3;
-	int b=4;
+	int q=5;
+	int b=5;
 	int c=0;
 	
 	

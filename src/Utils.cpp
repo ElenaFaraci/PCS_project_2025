@@ -374,9 +374,7 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b
     return new_vertex;
 }
 
-int Esiste_gia(PolygonalMesh& mesh,
-               const Eigen::Vector3d& nuovo_vertice,
-               unsigned int k) {				   
+int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsigned int k) {				   
 	double epsilon = 1e-11;
     for (int i = 0; i < k; ++i) {
         if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
@@ -407,6 +405,9 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 	unsigned int k = mesh.NumCell0Ds;
 	cout<<k<<endl;
 	
+	n=((b+1)*(b+2))/2;
+	vector<int> v(n,-1);
+	
 	mesh.Cell0DsCoordinates.conservativeResize(3, V);
 	
 	cout << "Dimensioni Cell0DsCoordinates: " 
@@ -426,9 +427,12 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		unsigned int y = y0;
 		unsigned int z = z0;
 		
+		v.push_back(x0);
+		
+		
 		unsigned int num_suddivisioni = b;
 		
-		//iterazione sui puani
+		//iterazione sui piani
 		for(unsigned int w = 0; w < b-1; w++){
 			
 			//per ogni piano creo i vertici
@@ -438,8 +442,11 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 				if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
+					v.push_back(k);
 					//cout<<mesh.Cell0DsId[k]<<endl;
 					k ++;
+				}else{
+					v.push_back(Esiste_gia(mesh, nuovo_vertice, k));
 				}
 								
 			}
@@ -448,29 +455,47 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 			//creo inizio e fine del piano successivo
 			Eigen::Vector3d nuovo_vertice= Nuovo_Vertice(x0, z0, b, w + 1, mesh);
 			
-			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+			unsigned int id = Esiste_gia(mesh, nuovo_vertice, k);
+			//se il nuovo vertice non esiste, lo aggiungo, altrimenti uso quello già fatto
+			if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					cout<<mesh.Cell0DsId[k]<<endl;
+					//cout<<mesh.Cell0DsId[k]<<endl;
 					x=k;
+					v.push_back(k);
 					k ++;
+				} else{
+					//il vertice esistente
+					x=id;
+					v.push_back(id);
 				}
 			
 			
 			
 			nuovo_vertice = Nuovo_Vertice(y0, z0, b, w + 1, mesh);
-			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+			id=Esiste_gia(mesh, nuovo_vertice, k);
+			if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					cout<<mesh.Cell0DsId[k]<<endl;
+					//cout<<mesh.Cell0DsId[k]<<endl;
 					y=k;
+					v.push_back(k);
 					k ++;
+				} else{
+					y=id;
+					v.push_back(id);
 				}
 			
 			
 		}
-		// BISOGNA AGGIORNARE NUM CELL2DS COORD ECC...
+		
 }
+	mesh.NumCell0Ds=k;
+	cout<<"---------------------- "<<mesh.NumCell0Ds<<endl;
+	for(int i=0;i<v.size();i++){
+		cout<<v[i]<<endl;
+	}
+	
 }
 /*
 //funzione baricentro
