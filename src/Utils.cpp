@@ -365,6 +365,11 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int i
 	Eigen::Vector3d vertex1 = mesh.Cell0DsCoordinates.col(id1);
 	Eigen::Vector3d vertex2 = mesh.Cell0DsCoordinates.col(id2);
 	Eigen::Vector3d vertex0 = mesh.Cell0DsCoordinates.col(id0);
+	
+	if ((vertex2 - vertex1).norm() < 1e-12) {
+        cerr << "Attenzione: vertex1 e vertex2 coincidono, non si può interpolare" << endl;
+        return vertex0;
+    }
 	Eigen::Vector3d new_vertex = (vertex2 - vertex1) * ((double)step/b) + vertex0;
 	//cout << "Coordinate del nuovo vertice: " << new_vertex.transpose() << endl;
     return new_vertex;
@@ -376,9 +381,9 @@ int Esiste_gia(PolygonalMesh& mesh,
 	double epsilon = 1e-11;
     for (int i = 0; i < k; ++i) {
         if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
-			cout<<"duplicato del vertice: "<<i<<endl;
+			//cout<<"duplicato del vertice: "<<i<<endl;
             return i; // vertice esistente trovato
-			cout<<"duplicato del vertice: "<<i<<endl;
+			//cout<<"duplicato del vertice: "<<i<<endl;
         }
     }
     return -1; // non trovato
@@ -410,11 +415,13 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
           << mesh.Cell0DsCoordinates.cols() <<endl;
 
 	
-	
+	// iterazione sulle facce
 	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
 		unsigned int z0 = mesh.Cell2DsVertices[j][2];
+		
+		cout << "i vertici della faccia: "<<j<<" sono: "<<x0<<" "<<y0<<" "<<z0<<" "<<endl;
 		
 		unsigned int x = x0;
 		unsigned int y = y0;
@@ -422,26 +429,24 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		
 		unsigned int num_suddivisioni = b;
 		
+		//iterazione sui puani
 		for(unsigned int w = 0; w < b-1; w++){
 			
+			//per ogni piano creo i vertici
 			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
 				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
 				
 				if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					cout<<mesh.Cell0DsId[k]<<endl;
+					//cout<<mesh.Cell0DsId[k]<<endl;
 					k ++;
 				}
-				
-				
-				
-				//mesh.Cell0DsCoordinates.col(k) = Nuovo_Vertice(x, y, x, num_suddivisioni, i + 1, mesh);
-				
+								
 			}
 			num_suddivisioni --;
-			// sto inserendo vertici duplicati
 			
+			//creo inizio e fine del piano successivo
 			Eigen::Vector3d nuovo_vertice= Nuovo_Vertice(x0, z0, x0, b, w + 1, mesh);
 			
 			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
@@ -465,7 +470,7 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 			
 			
 		}
-		
+		// BISOGNA AGGIORNARE NUM CELL2DS COORD ECC...
 }
 	return true;
 	
