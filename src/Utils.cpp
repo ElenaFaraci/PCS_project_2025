@@ -472,6 +472,129 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		}
 		// BISOGNA AGGIORNARE NUM CELL2DS COORD ECC...
 }
+<<<<<<< HEAD
+//funzione baricentro
+Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {
+    Eigen::Vector3d b = Eigen::Vector3d::Zero();
+    for (size_t v : vertici) {
+        b += coords.col(v);
+    }
+    return b / vertici.size();
+}
+
+//funzione duale
+PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
+    PolygonalMesh duale;
+
+    size_t num_facce = mesh.Cells2D.size(); // al posto del secondo membro posso direttamente scrivere NumCell2Ds
+    duale.Cell0DCoordinates.resize(3, num_facce);
+
+    for (size_t i = 0; i < num_facce; ++i) {
+        duale.Cell0DCoordinates[i] = baricentro(mesh.Cell2DsVertices[i], mesh.Cell0DCoordinates);
+    }
+
+    size_t max_connessioni = num_facce * (num_facce - 1) / 2;
+    duale.Cells1D.resize(max_connessioni);
+
+    size_t count = 0;
+
+    for (size_t i = 0; i < num_facce; ++i) {
+        const std::vector<size_t>& faccia_i = Cells2DEdges[i];
+
+        for (size_t j = i + 1; j < num_facce; ++j) {
+            const std::vector<size_t>& faccia_j = Cells2DEdges[j];
+
+            bool adiacenti = false;
+
+            for (size_t a = 0; a < faccia_i.size(); ++a) {
+                size_t vi1 = faccia_i[a];
+                //size_t vi2 = faccia_i[(a + 1) % faccia_i.size()];
+
+                for (size_t b = 0; b < faccia_j.size(); ++b) {
+                    size_t vj1 = faccia_j[b];
+                    //size_t vj2 = faccia_j[(b + 1) % faccia_j.size()];
+
+                    if (vi1 == vj1){
+                        adiacenti = true;
+                        break;
+                    }
+                }
+
+                if (adiacenti) break;
+            }
+
+            if (adiacenti) {
+                duale.Cell1DsExtrema.col(count) << i, j;;
+                ++count;
+            }
+        }
+    }
+
+    duale.Cell1DsExtrema.conservativeResize(2,count);
+
+    return duale;
+}
+
+
+	
+	/*const unsigned int new_vertex = 2 * num_suddivisioni - 1;
+    const unsigned int start_index = mesh.NumCell0Ds;
+
+    mesh.Cell0DsCoordinates.conservativeResize(3, start_index + new_vertex);
+	 for (unsigned int i = 0; i < new_vertex; ++i) {
+		 double step_ratio = double(i) / (new_vertex);
+		  mesh.Cell0DsCoordinates.col(start_index + i) = Nuovo_Vertice(0, 1, 0, step_ratio, mesh);
+}
+	mesh.NumCell0Ds += new_vertices;
+	return true;
+*/
+}
+/*
+Eigen::VectorXd crea_vertice(unsigned int id_1, unsigned int id_2, 
+				  unsigned int step, unsigned int id_start,
+				  unsigned int b, const PolygonalMesh& mesh){
+	// restituisce le coordinate del nuovo punto 
+	Eigen::VectorXd point_1 = mesh.Cell0DsCoordinates.col(id_1);
+	Eigen::VectorXd point_2 = mesh.Cell0DsCoordinates.col(id_2);
+	Eigen::VectorXd point_s = mesh.Cell0DsCoordinates.col(id_start);
+	
+	Eigen::VectorXd new_point=(point_2-point_1)*((double)step/b)+point_s;
+	
+	    if (new_point.size() != 3) {
+        std::cerr << "Errore: la colonna non ha 3 elementi.\n";
+        //return 1;
+    }
+
+    std::array<double, 3> arr;
+    for (int i = 0; i < 3; ++i) {
+        arr[i] = new_point(i);
+    }
+	
+		
+	cout<<ArrayToString(3,&arr[0])<<endl;
+	
+	return new_point;
+	
+	
+}
+
+bool triangolazione(PolygonalMesh& mesh){
+	f=0; id faccia
+	
+	
+	
+	
+	// ciò che segue sarà inglobato in un for su b, b andrà a decrescere
+	
+	mesh.Cell0DsCoordinates.conservativeResize(3, mesh.NumCell0Ds+(2*b-1));
+	mesh.Cell0DsCoordinates.col(mesh.NumCell0Ds)=crea_vertice(...TODO...)
+	for (i=0; i<b-1;i++){
+		
+	}
+	mesh.NumCell0Ds+=(2*b-1);
+	
+=======
+>>>>>>> 413c43f3cbf97c3e2275a5b08f2d90205cb244d9
 	return true;
 	
 }
