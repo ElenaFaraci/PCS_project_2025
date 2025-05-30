@@ -378,9 +378,7 @@ int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsign
 	double epsilon = 1e-11;
     for (int i = 0; i < k; ++i) {
         if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
-			//cout<<"duplicato del vertice: "<<i<<endl;
             return i; // vertice esistente trovato
-			//cout<<"duplicato del vertice: "<<i<<endl;
         }
     }
     return -1; // non trovato
@@ -405,8 +403,16 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 	unsigned int k = mesh.NumCell0Ds;
 	cout<<k<<endl;
 	
-	n=((b+1)*(b+2))/2;
-	vector<int> v(n,-1);
+	unsigned int num_facc_pre =mesh.NumCell2Ds;
+	//creo un vettore punti_faccia che contenga i vertici, nuovi e vecchi, di ciascuna faccia
+	
+	// può anche essere unidea la seguente, anche con 3 vettori annidati...
+	//std::vector<std::vector<int>> punti_per_faccia(mesh.NumCell2Ds);
+	unsigned int num_nuovi_per_faccia=((b+1)*(b+2))/2;
+	unsigned int n=num_nuovi_per_faccia*num_facc_pre;
+	vector<int> punti_faccia;
+	punti_faccia.reserve(n);
+	
 	
 	mesh.Cell0DsCoordinates.conservativeResize(3, V);
 	
@@ -427,7 +433,7 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		unsigned int y = y0;
 		unsigned int z = z0;
 		
-		v.push_back(x0);
+		punti_faccia.push_back(x0);
 		
 		
 		unsigned int num_suddivisioni = b;
@@ -438,65 +444,85 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 			//per ogni piano creo i vertici
 			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
 				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, num_suddivisioni, i + 1, mesh);
-				
-				if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+				int id=Esiste_gia(mesh, nuovo_vertice, k);
+				if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					v.push_back(k);
-					//cout<<mesh.Cell0DsId[k]<<endl;
+					punti_faccia.push_back(k);
 					k ++;
 				}else{
-					v.push_back(Esiste_gia(mesh, nuovo_vertice, k));
+					punti_faccia.push_back(Esiste_gia(mesh, nuovo_vertice, k));
 				}
 								
 			}
 			num_suddivisioni --;
 			
+			//aggiungo al vettore la fine del piano appena concluso
+			punti_faccia.push_back(y);
+			
 			//creo inizio e fine del piano successivo
 			Eigen::Vector3d nuovo_vertice= Nuovo_Vertice(x0, z0, b, w + 1, mesh);
 			
-			unsigned int id = Esiste_gia(mesh, nuovo_vertice, k);
+			int id = Esiste_gia(mesh, nuovo_vertice, k);
 			//se il nuovo vertice non esiste, lo aggiungo, altrimenti uso quello già fatto
 			if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					//cout<<mesh.Cell0DsId[k]<<endl;
 					x=k;
-					v.push_back(k);
+					punti_faccia.push_back(k);
 					k ++;
 				} else{
 					//il vertice esistente
 					x=id;
-					v.push_back(id);
+					punti_faccia.push_back(id);
 				}
-			
-			
 			
 			nuovo_vertice = Nuovo_Vertice(y0, z0, b, w + 1, mesh);
 			id=Esiste_gia(mesh, nuovo_vertice, k);
 			if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					//cout<<mesh.Cell0DsId[k]<<endl;
 					y=k;
-					v.push_back(k);
+					//punti_faccia.push_back(k);
 					k ++;
 				} else{
 					y=id;
-					v.push_back(id);
+					//punti_faccia.push_back(id);
 				}
 			
 			
 		}
 		
+	//ho finito la faccia e sono pronto ad iniziare la successiva, ma macano
+	// da aggiungere a punti_faccia l'ultimo punto dell'ultimo strato e il vertice finale
+	punti_faccia.push_back(y);
+	punti_faccia.push_back(z0);	
+	
 }
-	mesh.NumCell0Ds=k;
-	cout<<"---------------------- "<<mesh.NumCell0Ds<<endl;
-	for(int i=0;i<v.size();i++){
-		cout<<v[i]<<endl;
+
+
+	
+	cout<<"mi aspettavo: "<<n<<" ho invece: "<<punti_faccia.size()<<endl;
+	for(int i=0;i<punti_faccia.size();i++){
+		cout<<punti_faccia[i]<<endl;
+	}
+	//di seguito andrò a creare le nuove facce e lati
+	
+	//alla fine aggiorno il num facce tutto della mesh
+}
+
+void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,
+					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia){
+	
+	for (j=0;j<num_facc_pre, j++){
+		
 	}
 	
 }
+
+
+
+
 /*
 //funzione baricentro
 Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {
