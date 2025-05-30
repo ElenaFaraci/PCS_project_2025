@@ -397,6 +397,69 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b){
 		}
 		
 }
+//funzione baricentro
+Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {
+    Eigen::Vector3d b = Eigen::Vector3d::Zero();
+    for (size_t v : vertici) {
+        b += coords.col(v);
+    }
+    return b / vertici.size();
+}
+
+//funzione duale
+PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
+    PolygonalMesh duale;
+
+    size_t num_facce = mesh.Cells2D.size(); // al posto del secondo membro posso direttamente scrivere NumCell2Ds
+    duale.Cell0DCoordinates.resize(3, num_facce);
+
+    for (size_t i = 0; i < num_facce; ++i) {
+        duale.Cell0DCoordinates[i] = baricentro(mesh.Cell2DsVertices[i], mesh.Cell0DCoordinates);
+    }
+
+    size_t max_connessioni = num_facce * (num_facce - 1) / 2;
+    duale.Cells1D.resize(max_connessioni);
+
+    size_t count = 0;
+
+    for (size_t i = 0; i < num_facce; ++i) {
+        const std::vector<size_t>& faccia_i = Cells2DEdges[i];
+
+        for (size_t j = i + 1; j < num_facce; ++j) {
+            const std::vector<size_t>& faccia_j = Cells2DEdges[j];
+
+            bool adiacenti = false;
+
+            for (size_t a = 0; a < faccia_i.size(); ++a) {
+                size_t vi1 = faccia_i[a];
+                //size_t vi2 = faccia_i[(a + 1) % faccia_i.size()];
+
+                for (size_t b = 0; b < faccia_j.size(); ++b) {
+                    size_t vj1 = faccia_j[b];
+                    //size_t vj2 = faccia_j[(b + 1) % faccia_j.size()];
+
+                    if (vi1 == vj1){
+                        adiacenti = true;
+                        break;
+                    }
+                }
+
+                if (adiacenti) break;
+            }
+
+            if (adiacenti) {
+                duale.Cell1DsExtrema.col(count) << i, j;;
+                ++count;
+            }
+        }
+    }
+
+    duale.Cell1DsExtrema.conservativeResize(2,count);
+
+    return duale;
+}
+
+
 	
 	/*const unsigned int new_vertex = 2 * num_suddivisioni - 1;
     const unsigned int start_index = mesh.NumCell0Ds;
