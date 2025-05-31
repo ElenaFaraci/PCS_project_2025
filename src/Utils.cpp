@@ -375,6 +375,7 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b
     return new_vertex;
 }
 
+
 int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsigned int k) {				   
 	double epsilon = 1e-11;
     for (int i = 0; i < k; ++i) {
@@ -384,8 +385,6 @@ int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsign
     }
     return -1; // non trovato
 }
-
-
 
 
 
@@ -400,30 +399,21 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		V=10*T+2;
 	}
 	
-	//cout<<V<<endl;
-	unsigned int k = mesh.NumCell0Ds;
-	cout<<k<<endl;
-	
+	unsigned int k = mesh.NumCell0Ds;	
 	unsigned int num_facc_pre =mesh.NumCell2Ds;
-	//creo un vettore punti_faccia che contenga i vertici, nuovi e vecchi, di ciascuna faccia
 	
-	// può anche essere unidea la seguente, anche con 3 vettori annidati...
-	//std::vector<std::vector<int>> punti_per_faccia(mesh.NumCell2Ds);
+	//creo un vettore punti_faccia che contenga i vertici, nuovi e vecchi, di ciascuna faccia
 	unsigned int num_nuovi_per_faccia=((b+1)*(b+2))/2;
 	unsigned int n=num_nuovi_per_faccia*num_facc_pre;
 	vector<int> punti_faccia;
 	punti_faccia.reserve(n);
 	
-	
+	// resize della matrice che ospiterà anche i nuovi vertici
 	mesh.Cell0DsCoordinates.conservativeResize(3, V);
-	
-	//cout << "Dimensioni Cell0DsCoordinates: " 
-    //      << mesh.Cell0DsCoordinates.rows() << " x " 
-    //     << mesh.Cell0DsCoordinates.cols() <<endl;
-
 	
 	// iterazione sulle facce
 	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
+		
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
 		unsigned int z0 = mesh.Cell2DsVertices[j][2];
@@ -434,8 +424,8 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		unsigned int y = y0;
 		unsigned int z = z0;
 		
-		punti_faccia.push_back(x0);
-		
+		// per ogni faccia srotolo i punti su punti_faccia a partire dal primo vertice
+		punti_faccia.push_back(x0);  
 		
 		unsigned int num_suddivisioni = b;
 		
@@ -444,6 +434,12 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 			
 			//per ogni piano creo i vertici
 			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
+				
+				//se un punto che sto creando, esiste già, allora aggiungerò il suo 
+				//id al vettore punti_faccia e nulla alla matrice Cell0DsCoordinates
+				//se invece il vertice è nuovo, gli assegno l'id successivo all'ultimo creato
+				//e poi lo aggiungo a Cell0DsCoordinates (coordinate) e punti_faccia (id)
+				
 				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, num_suddivisioni, i + 1, mesh);
 				int id=Esiste_gia(mesh, nuovo_vertice, k);
 				if (id==-1){
@@ -472,57 +468,41 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 					x=k;
 					punti_faccia.push_back(k);
 					k ++;
-				} else{
-					//il vertice esistente
-					x=id;
-					punti_faccia.push_back(id);
-				}
+			} else{
+				x=id;
+				punti_faccia.push_back(id);
+			}
 			
+			// il vertice che aggiungo quì sotto, non va messo nel punti_faccia ora
+			// perchè si trova alla fine del suo piano
 			nuovo_vertice = Nuovo_Vertice(y0, z0, b, w + 1, mesh);
 			id=Esiste_gia(mesh, nuovo_vertice, k);
 			if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
 					y=k;
-					//punti_faccia.push_back(k);
 					k ++;
-				} else{
-					y=id;
-					//punti_faccia.push_back(id);
-				}
-			
-			
+			} else{
+				y=id;
+			}
 		}
 		
 	//ho finito la faccia e sono pronto ad iniziare la successiva, ma macano
-	// da aggiungere a punti_faccia l'ultimo punto dell'ultimo strato e il vertice finale
+	// da aggiungere a punti_faccia l'ultimo punto dell'ultimo strato e il vertice finale (sommità del triangolo)
 	punti_faccia.push_back(y);
 	punti_faccia.push_back(z0);	
 	
-}
-
-
+	}
 	
-	//cout<<"mi aspettavo: "<<n<<" ho invece: "<<punti_faccia.size()<<endl;
-	//for(int i=0;i<punti_faccia.size();i++){
-	//	cout<<punti_faccia[i]<<endl;
-	//}
+	// posso aggiornare ora mesh.NumCell0Ds
+	mesh.NumCell0Ds=k;
 	
 	//di seguito andrò a creare le nuove facce e lati
 	
 	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
 	tri_lati_facce(mesh, b, num_facc_pre);
 	
-	//for (int i=0;i<mesh.Cell2DsVertices.size();i++){
-	//	for (int j=0;j<mesh.Cell2DsVertices[i].size();j++){
-	//		cout<<mesh.Cell2DsVertices[i][j]<<"; ";
-	//	}
-	//	cout<<endl;
-	//}
-	//cout<<mesh.Cell2DsVertices.size()<<endl;
-	
-	
-	//alla fine aggiorno il num facce tutto della mesh
+	// --> TODO alla fine aggiorno il num facce tutto della mesh
 }
 
 void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,
@@ -572,9 +552,8 @@ void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_fa
 		offset_faccia += num_nuovi_per_faccia;
 	}
 
-	//cout<<"avevo fatto un reserve di: "<<mesh.Cell2DsVertices.capacity()<<endl;
-	//cout<<"la mesh.Cell2DsVertices contiene: "<<mesh.Cell2DsVertices.size()<<endl;
-	
+	//posso aggiornare mesh.NumCell2Ds
+	mesh.NumCell2Ds=num_facc_pre*b*b;
 }
 
 
@@ -642,8 +621,10 @@ void info_mesh(const PolygonalMesh& mesh){
     cout << "Cell0DsId: ";
     for (auto id : mesh.Cell0DsId)
         cout << id << " ";
-    cout << "\nCell0DsCoordinates:\n" << mesh.Cell0DsCoordinates << "\n";
-
+    cout << "\nCell0DsCoordinates:\n";
+	for (int i=0;i<mesh.NumCell0Ds;i++){
+	cout<<"{"<< mesh.Cell0DsCoordinates.col(i).transpose() <<"} ";
+	}
 
     // --- Cell1D ---
     cout << "\n-- Cell1D --\n";
