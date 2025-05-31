@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include "Eigen/Eigen"
 /*
 SCALETTA:
 main, cmake, gitignore, finire poliedri (questa settimana)
@@ -374,21 +375,16 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b
     return new_vertex;
 }
 
-int Esiste_gia(PolygonalMesh& mesh,
-               const Eigen::Vector3d& nuovo_vertice,
-               unsigned int k) {				   
+
+int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsigned int k) {				   
 	double epsilon = 1e-11;
     for (int i = 0; i < k; ++i) {
         if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
-			//cout<<"duplicato del vertice: "<<i<<endl;
             return i; // vertice esistente trovato
-			//cout<<"duplicato del vertice: "<<i<<endl;
         }
     }
     return -1; // non trovato
 }
-
-
 
 
 
@@ -403,75 +399,276 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		V=10*T+2;
 	}
 	
-	//cout<<V<<endl;
-	unsigned int k = mesh.NumCell0Ds;
-	cout<<k<<endl;
+	unsigned int k = mesh.NumCell0Ds;	
+	unsigned int num_facc_pre =mesh.NumCell2Ds;
 	
+	//creo un vettore punti_faccia che contenga i vertici, nuovi e vecchi, di ciascuna faccia
+	unsigned int num_nuovi_per_faccia=((b+1)*(b+2))/2;
+	unsigned int n=num_nuovi_per_faccia*num_facc_pre;
+	vector<int> punti_faccia;
+	punti_faccia.reserve(n);
+	
+	// resize della matrice che ospiterà anche i nuovi vertici
 	mesh.Cell0DsCoordinates.conservativeResize(3, V);
-	
-	cout << "Dimensioni Cell0DsCoordinates: " 
-          << mesh.Cell0DsCoordinates.rows() << " x " 
-          << mesh.Cell0DsCoordinates.cols() <<endl;
-
 	
 	// iterazione sulle facce
 	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
+		
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
 		unsigned int z0 = mesh.Cell2DsVertices[j][2];
 		
-		cout << "i vertici della faccia: "<<j<<" sono: "<<x0<<" "<<y0<<" "<<z0<<" "<<endl;
+		//cout << "i vertici della faccia: "<<j<<" sono: "<<x0<<" "<<y0<<" "<<z0<<" "<<endl;
 		
 		unsigned int x = x0;
 		unsigned int y = y0;
 		unsigned int z = z0;
 		
+		// per ogni faccia srotolo i punti su punti_faccia a partire dal primo vertice
+		punti_faccia.push_back(x0);  
+		
 		unsigned int num_suddivisioni = b;
 		
-		//iterazione sui puani
+		//iterazione sui piani
 		for(unsigned int w = 0; w < b-1; w++){
 			
 			//per ogni piano creo i vertici
 			for(unsigned int i = 0; i < num_suddivisioni -1; i++) {
-				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, num_suddivisioni, i + 1, mesh);
 				
-				if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+				//se un punto che sto creando, esiste già, allora aggiungerò il suo 
+				//id al vettore punti_faccia e nulla alla matrice Cell0DsCoordinates
+				//se invece il vertice è nuovo, gli assegno l'id successivo all'ultimo creato
+				//e poi lo aggiungo a Cell0DsCoordinates (coordinate) e punti_faccia (id)
+				
+				Eigen::Vector3d nuovo_vertice = Nuovo_Vertice(x, y, num_suddivisioni, i + 1, mesh);
+				int id=Esiste_gia(mesh, nuovo_vertice, k);
+				if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					//cout<<mesh.Cell0DsId[k]<<endl;
+					punti_faccia.push_back(k);
 					k ++;
+				}else{
+					punti_faccia.push_back(Esiste_gia(mesh, nuovo_vertice, k));
 				}
 								
 			}
 			num_suddivisioni --;
 			
+			//aggiungo al vettore la fine del piano appena concluso
+			punti_faccia.push_back(y);
+			
 			//creo inizio e fine del piano successivo
 			Eigen::Vector3d nuovo_vertice= Nuovo_Vertice(x0, z0, b, w + 1, mesh);
 			
-			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+			int id = Esiste_gia(mesh, nuovo_vertice, k);
+			//se il nuovo vertice non esiste, lo aggiungo, altrimenti uso quello già fatto
+			if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					cout<<mesh.Cell0DsId[k]<<endl;
 					x=k;
+					punti_faccia.push_back(k);
 					k ++;
-				}
+			} else{
+				x=id;
+				punti_faccia.push_back(id);
+			}
 			
-			
-			
+			// il vertice che aggiungo quì sotto, non va messo nel punti_faccia ora
+			// perchè si trova alla fine del suo piano
 			nuovo_vertice = Nuovo_Vertice(y0, z0, b, w + 1, mesh);
-			if (Esiste_gia(mesh, nuovo_vertice, k)==-1){
+			id=Esiste_gia(mesh, nuovo_vertice, k);
+			if (id==-1){
 					mesh.Cell0DsCoordinates.col(k) = nuovo_vertice;
 					mesh.Cell0DsId.push_back(k);
-					cout<<mesh.Cell0DsId[k]<<endl;
 					y=k;
 					k ++;
+			} else{
+				y=id;
+			}
+		}
+		
+	//ho finito la faccia e sono pronto ad iniziare la successiva, ma macano
+	// da aggiungere a punti_faccia l'ultimo punto dell'ultimo strato e il vertice finale (sommità del triangolo)
+	punti_faccia.push_back(y);
+	punti_faccia.push_back(z0);	
+	
+	}
+	
+	// posso aggiornare ora mesh.NumCell0Ds
+	mesh.NumCell0Ds=k;
+	
+	//di seguito andrò a creare le nuove facce e lati
+	
+	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
+	tri_lati_facce(mesh, b, num_facc_pre);
+	
+	// --> TODO alla fine aggiorno il num facce tutto della mesh
+}
+
+void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,
+					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia){
+	
+	//TODO: - vedere se effettivamente sto aggiungendo tutti i triangoli --> ok
+	//      - un po di efficienza.. pushback non mi piace senza resize --> ok
+	//		- eliminare le vecchie facce? --> ok...ma va bene?
+	
+	
+	mesh.Cell2DsVertices={};
+	mesh.Cell2DsVertices.reserve(num_facc_pre*b*b);
+	
+	
+	unsigned int offset_faccia = 0;
+	
+
+	for (unsigned int j = 0; j < num_facc_pre; j++) {
+		vector<unsigned int> inizio_strato(b + 1);
+		unsigned int pos = offset_faccia;
+		for (unsigned int r = 0; r <= b; r++) {
+			inizio_strato[r] = pos;
+			pos += b - r + 1;
+		}
+
+		for (unsigned int r = 0; r < b; r++) {
+			unsigned int base_r = inizio_strato[r];
+			unsigned int base_r1 = inizio_strato[r + 1];
+			unsigned int len_r = b - r + 1;
+
+			for (unsigned int k = 0; k < len_r - 1; k++) {
+				unsigned int a  = punti_faccia[base_r + k];
+				unsigned int b_ = punti_faccia[base_r + k + 1];
+				unsigned int c  = punti_faccia[base_r1 + k];
+				unsigned int d  = punti_faccia[base_r1 + k + 1];
+
+				// Triangolo 1
+				mesh.Cell2DsVertices.push_back({a, b_, c});
+
+				// Triangolo 2, solo se non siamo all'ultimo k (serve d)
+				if (k < len_r - 2) {
+					mesh.Cell2DsVertices.push_back({b_, d, c});
 				}
+			}
+		}
+
+		offset_faccia += num_nuovi_per_faccia;
+	}
+
+	//posso aggiornare mesh.NumCell2Ds
+	mesh.NumCell2Ds=num_facc_pre*b*b;
+}
+
+
+int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh) {
+    
+	int p1 = min(point_1, point_2);
+    int p2 = max(point_1, point_2);
+
+    for (int i = 0; i < mesh.Cell1DsExtrema.cols(); i++) {
+        int q1 = mesh.Cell1DsExtrema(0, i);
+        int q2 = mesh.Cell1DsExtrema(1, i);
+        if ((p1 == min(q1, q2)) && (p2 == max(q1, q2))) {
+            return i; 
+        }
+    }
+
+    return -1; 
+}
+
+
+
+void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre){
+	
+	
+	mesh.Cell2DsEdges = {};
+	mesh.Cell2DsEdges.reserve(mesh.Cell2DsVertices.size());
+	
+	unsigned int num_lati=num_facc_pre*3*b*(b+1)/2; //è per eccesso... da rivedere
+	mesh.Cell1DsExtrema.resize(2, num_lati);
+	unsigned int k=0;
+	for (unsigned int j=0;j<mesh.Cell2DsVertices.size();j++){
+		vector<unsigned int> v={};
+		v.reserve(3);
+		for (unsigned int i=0;i<3;i++){
+			unsigned int point_1 = mesh.Cell2DsVertices[j][i];
+			unsigned int point_2 = mesh.Cell2DsVertices[j][(i+1)%3];
 			
+			int id_l=esiste_gia_1D(point_1, point_2, mesh);
+			if (id_l==-1){
+				// il lato è nuovo
+				Vector2i new_l(point_1,point_2);
+				mesh.Cell1DsExtrema.col(k)=new_l;
+				v.push_back(k);
+				k++;
+				// ma devo aggiungere anche gli id dei lati
+			} else{
+				// il lato esiste già 
+				v.push_back(id_l);
+			}
 			
 		}
-		// BISOGNA AGGIORNARE NUM CELL2DS COORD ECC...
+		mesh.Cell2DsEdges.push_back(v);
+	}
 }
+
+
+void info_mesh(const PolygonalMesh& mesh){
+	//questa funzione stampa i dati della mesh... mi aiuta a vedere se sto aggiornando tutto
+
+    cout << "========== MESH ==========\n";
+
+    // --- Cell0D ---
+    cout << "\n-- Cell0D --\n";
+    cout << "Numero di Cell0Ds: " << mesh.NumCell0Ds << "\n";
+    cout << "Cell0DsId: ";
+    for (auto id : mesh.Cell0DsId)
+        cout << id << " ";
+    cout << "\nCell0DsCoordinates:\n";
+	for (int i=0;i<mesh.NumCell0Ds;i++){
+	cout<<"{"<< mesh.Cell0DsCoordinates.col(i).transpose() <<"} ";
+	}
+
+    // --- Cell1D ---
+    cout << "\n-- Cell1D --\n";
+    cout << "Numero di Cell1Ds: " << mesh.NumCell1Ds << "\n";
+    cout << "Cell1DsId: ";
+    for (auto id : mesh.Cell1DsId)
+        cout << id << " ";
+    cout << "\nCell1DsExtrema:\n" << mesh.Cell1DsExtrema << "\n";
+
+
+    // --- Cell2D ---
+    cout << "\n-- Cell2D --\n";
+    cout << "Numero di Cell2Ds: " << mesh.NumCell2Ds << "\n";
+    cout << "Cell2DsId: ";
+    for (auto id : mesh.Cell2DsId)
+        cout << id << " ";
+    cout << "\nCell2DsNumVert: ";
+    for (auto n : mesh.Cell2DsNumVert)
+        cout << n << " ";
+    cout << "\nCell2DsNumEdg: ";
+    for (auto n : mesh.Cell2DsNumEdg)
+        cout << n << " ";
+
+    cout << "\n\nCell2DsVertices:\n";
+    for (size_t i = 0; i < mesh.Cell2DsVertices.size(); ++i) {
+        cout << "  [" << i << "]: ";
+        for (auto v : mesh.Cell2DsVertices[i])
+            cout << v << " ";
+        cout << "\n";
+    }
+
+    cout << "\nCell2DsEdges:\n";
+    for (size_t i = 0; i < mesh.Cell2DsEdges.size(); ++i) {
+        cout << "  [" << i << "]: ";
+        for (auto e : mesh.Cell2DsEdges[i])
+            cout << e << " ";
+        cout << "\n";
+    }
+
+    cout << "==========================\n";
+
 }
+
+
 /*
 //funzione baricentro
 Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {
