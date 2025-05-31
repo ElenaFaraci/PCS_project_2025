@@ -757,5 +757,10 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	
 */
 }
+/* TO DO: 1)lati e facce della triangolazione;
+          2)affinare il duale;
+		  3)creare funzione che stampi i file;
+		  4)meanwhile iniziare scrittura di qualche google test, ad esempio nel calcolo del baricentro, esiste già, vertici della triangolazione, etc...;
+		  
 
 
