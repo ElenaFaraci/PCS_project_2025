@@ -508,31 +508,37 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,
 					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia){
 	
-	//TODO: - vedere se effettivamente sto aggiungendo tutti i triangoli --> ok
-	//      - un po di efficienza.. pushback non mi piace senza resize --> ok
-	//		- eliminare le vecchie facce? --> ok...ma va bene?
-	
-	
+	//creo le nuove facce, perciò mi dimentico di quelle vecchie	
 	mesh.Cell2DsVertices={};
 	mesh.Cell2DsVertices.reserve(num_facc_pre*b*b);
 	
+	//riparto da capo anche con gli id
+	mesh.Cell2DsId ={};
+	mesh.Cell2DsId.reserve(num_facc_pre*b*b);
+	unsigned int count=0; //variabile invrementale che aggiornerà gli id
 	
+	// nel vettore punti_faccia i punti appartenenti ad una certa faccia iniziano con un 
+	// offset pari al numero di punti nelle facce precedenti
 	unsigned int offset_faccia = 0;
 	
-
+	//ciclo sulle facce
 	for (unsigned int j = 0; j < num_facc_pre; j++) {
 		vector<unsigned int> inizio_strato(b + 1);
 		unsigned int pos = offset_faccia;
+		
+		// inizio_strato mi dice l'indirizzo di partenza di ciascuno strato
 		for (unsigned int r = 0; r <= b; r++) {
 			inizio_strato[r] = pos;
 			pos += b - r + 1;
 		}
 
+		//selezione gli indirizzi di partenza di due strati consecutivi
 		for (unsigned int r = 0; r < b; r++) {
 			unsigned int base_r = inizio_strato[r];
 			unsigned int base_r1 = inizio_strato[r + 1];
 			unsigned int len_r = b - r + 1;
-
+			
+			// creo i triangoli
 			for (unsigned int k = 0; k < len_r - 1; k++) {
 				unsigned int a  = punti_faccia[base_r + k];
 				unsigned int b_ = punti_faccia[base_r + k + 1];
@@ -541,19 +547,25 @@ void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_fa
 
 				// Triangolo 1
 				mesh.Cell2DsVertices.push_back({a, b_, c});
+				mesh.Cell2DsId.push_back(count++);
 
 				// Triangolo 2, solo se non siamo all'ultimo k (serve d)
 				if (k < len_r - 2) {
 					mesh.Cell2DsVertices.push_back({b_, d, c});
+					mesh.Cell2DsId.push_back(count++);
 				}
 			}
 		}
-
+		
+		//incremento l'offset dei vertici aggiunti
 		offset_faccia += num_nuovi_per_faccia;
 	}
 
-	//posso aggiornare mesh.NumCell2Ds
-	mesh.NumCell2Ds=num_facc_pre*b*b;
+	//posso aggiornare le informazioni della mesh riguardanti Cell2D
+	mesh.NumCell2Ds=num_facc_pre*b*b;	
+	mesh.Cell2DsNumVert.assign(num_facc_pre*b*b,3);
+	mesh.Cell2DsNumEdg.assign(num_facc_pre*b*b,3);
+	
 }
 
 
@@ -574,14 +586,16 @@ int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh) {
 }
 
 
-
 void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre){
 	
+	unsigned int num_lati=num_facc_pre*3*b*(b+1)/2 -b*mesh.NumCell1Ds; 
 	
 	mesh.Cell2DsEdges = {};
 	mesh.Cell2DsEdges.reserve(mesh.Cell2DsVertices.size());
 	
-	unsigned int num_lati=num_facc_pre*3*b*(b+1)/2; //è per eccesso... da rivedere
+	mesh.Cell1DsId ={};
+	mesh.Cell1DsId.reserve(num_lati);
+	
 	mesh.Cell1DsExtrema.resize(2, num_lati);
 	unsigned int k=0;
 	for (unsigned int j=0;j<mesh.Cell2DsVertices.size();j++){
@@ -596,6 +610,7 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 				// il lato è nuovo
 				Vector2i new_l(point_1,point_2);
 				mesh.Cell1DsExtrema.col(k)=new_l;
+				mesh.Cell1DsId.push_back(k);
 				v.push_back(k);
 				k++;
 				// ma devo aggiungere anche gli id dei lati
@@ -607,48 +622,54 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 		}
 		mesh.Cell2DsEdges.push_back(v);
 	}
+	
+	mesh.NumCell1Ds=num_lati;
 }
 
 
 void info_mesh(const PolygonalMesh& mesh){
 	//questa funzione stampa i dati della mesh... mi aiuta a vedere se sto aggiornando tutto
 
-    cout << "========== MESH ==========\n";
+    cout << "========== MESH =========="<<endl<<endl;
 
     // --- Cell0D ---
-    cout << "\n-- Cell0D --\n";
-    cout << "Numero di Cell0Ds: " << mesh.NumCell0Ds << "\n";
+    cout << "-- Cell0D --"<<endl<<endl;
+    cout << "Numero di Cell0Ds: " << mesh.NumCell0Ds <<endl;
     cout << "Cell0DsId: ";
     for (auto id : mesh.Cell0DsId)
         cout << id << " ";
-    cout << "\nCell0DsCoordinates:\n";
+    cout <<endl<< "Cell0DsCoordinates:"<<endl;
 	for (int i=0;i<mesh.NumCell0Ds;i++){
 	cout<<"{"<< mesh.Cell0DsCoordinates.col(i).transpose() <<"} ";
 	}
+	cout<<endl;
 
     // --- Cell1D ---
-    cout << "\n-- Cell1D --\n";
-    cout << "Numero di Cell1Ds: " << mesh.NumCell1Ds << "\n";
+    cout <<endl<< "-- Cell1D --"<<endl<<endl;
+    cout << "Numero di Cell1Ds: " << mesh.NumCell1Ds << endl;
     cout << "Cell1DsId: ";
     for (auto id : mesh.Cell1DsId)
         cout << id << " ";
-    cout << "\nCell1DsExtrema:\n" << mesh.Cell1DsExtrema << "\n";
-
+	cout<<endl;
+    for (int i=0;i<mesh.Cell1DsExtrema.cols();i++){
+	cout<<"id: "<<i<<" {"<< mesh.Cell1DsExtrema.col(i).transpose() <<"} ";
+	}
+	cout<<endl;
 
     // --- Cell2D ---
-    cout << "\n-- Cell2D --\n";
-    cout << "Numero di Cell2Ds: " << mesh.NumCell2Ds << "\n";
+    cout <<endl<< "-- Cell2D --"<<endl<<endl;
+    cout << "Numero di Cell2Ds: " << mesh.NumCell2Ds << endl;
     cout << "Cell2DsId: ";
     for (auto id : mesh.Cell2DsId)
         cout << id << " ";
-    cout << "\nCell2DsNumVert: ";
+    cout << endl << "Cell2DsNumVert: ";
     for (auto n : mesh.Cell2DsNumVert)
         cout << n << " ";
-    cout << "\nCell2DsNumEdg: ";
+    cout <<endl<< "Cell2DsNumEdg: ";
     for (auto n : mesh.Cell2DsNumEdg)
         cout << n << " ";
 
-    cout << "\n\nCell2DsVertices:\n";
+    cout <<endl<< "Cell2DsVertices:"<<endl;
     for (size_t i = 0; i < mesh.Cell2DsVertices.size(); ++i) {
         cout << "  [" << i << "]: ";
         for (auto v : mesh.Cell2DsVertices[i])
@@ -656,12 +677,12 @@ void info_mesh(const PolygonalMesh& mesh){
         cout << "\n";
     }
 
-    cout << "\nCell2DsEdges:\n";
+    cout << "Cell2DsEdges:"<<endl;
     for (size_t i = 0; i < mesh.Cell2DsEdges.size(); ++i) {
         cout << "  [" << i << "]: ";
         for (auto e : mesh.Cell2DsEdges[i])
             cout << e << " ";
-        cout << "\n";
+        cout << endl;
     }
 
     cout << "==========================\n";

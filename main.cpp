@@ -12,7 +12,7 @@ int main(){
 	
 	PolygonalMesh mesh;
 	int p=3; // per ora non consideriamo altri casi se non 3
-	int q=3;
+	int q=4;
 	int b=3; //e se b=0 o 1...vedere
 	int c=0;
 	
@@ -31,8 +31,11 @@ int main(){
 		bool f= Triangolazione(mesh, b, c, q);
 	}
 	
+	if (!controllo_lati_vertici (mesh)){
+		cout<<"fallisce controllo post triangolazione"<<endl;
+	}
 	
-	info_mesh(mesh);
+	//info_mesh(mesh);
 	
 
 	Gedim::UCDUtilities utilities;
