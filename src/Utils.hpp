@@ -27,7 +27,11 @@ int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsign
 void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,
 					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia);
 
+int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh);
 
+void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre);
+
+void info_mesh(const PolygonalMesh& mesh);
 
 }
 

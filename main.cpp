@@ -13,7 +13,7 @@ int main(){
 	PolygonalMesh mesh;
 	int p=3; // per ora non consideriamo altri casi se non 3
 	int q=3;
-	int b=3;
+	int b=3; //e se b=0 o 1...vedere
 	int c=0;
 	
 	
@@ -32,7 +32,7 @@ int main(){
 	}
 	
 	
-	
+	info_mesh(mesh);
 	
 
 	Gedim::UCDUtilities utilities;
