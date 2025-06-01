@@ -13,7 +13,7 @@ int main(){
 	PolygonalMesh mesh;
 	int p=3; // per ora non consideriamo altri casi se non 3
 	int q=4;
-	int b=3; //e se b=0 o 1...vedere
+	int b=1; //e se b=0 o 1...vedere
 	int c=0;
 	
 	
@@ -26,16 +26,23 @@ int main(){
 		cout<<"fallisce controllo"<<endl;
 	}	
 		
+	// dobbiamo controllare l'input, positività, interi ecc...
 	
-	if (b==0 or c==0){
-		bool f= Triangolazione(mesh, b, c, q);
+	if ((b+c)!=0 and (b==0 or c==0)){
+		if ((b+c)==1){
+			cout<<"non c'è bisogno di fare triangolazione, gli indici sono b = "<<b<<" c = "<<c<<endl;
+		} else{
+			bool f= Triangolazione(mesh, b, c, q);
+		}
+	} else{
+		cout<<"indici di triangolazione non validi per ora..."<<endl;
 	}
 	
 	if (!controllo_lati_vertici (mesh)){
 		cout<<"fallisce controllo post triangolazione"<<endl;
 	}
 	
-	//info_mesh(mesh);
+	info_mesh(mesh);
 	
 
 	Gedim::UCDUtilities utilities;

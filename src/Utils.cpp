@@ -399,6 +399,10 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 		V=10*T+2;
 	}
 	
+	if (b==0){
+		b=c;
+	}
+	
 	unsigned int k = mesh.NumCell0Ds;	
 	unsigned int num_facc_pre =mesh.NumCell2Ds;
 	
@@ -762,5 +766,5 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 		  3)creare funzione che stampi i file;
 		  4)meanwhile iniziare scrittura di qualche google test, ad esempio nel calcolo del baricentro, esiste già, vertici della triangolazione, etc...;
 		  
-
+*/
 
