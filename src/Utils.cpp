@@ -692,8 +692,64 @@ void info_mesh(const PolygonalMesh& mesh){
     cout << "==========================\n";
 
 }
+// Funzioni di salvataggio e stampa celle in txt
+//Cella 0D
+void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename) {
+    std::ofstream file(filename);
 
+    for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
+        file << mesh.Cell0DsId[i] << " "
+             << mesh.Cell0DsCoordinates(0, i) << " "
+             << mesh.Cell0DsCoordinates(1, i) << " "
+             << mesh.Cell0DsCoordinates(2, i) << "\n";
+    }
+    file.close();
+}
 
+//Cella 1D
+void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename) {
+    std::ofstream file(filename);
+
+    for (unsigned int i = 0; i < mesh.NumCell1Ds; i++) {
+        file << mesh.Cell1DsId[i] << " "
+             << mesh.Cell1DsExtrema(0, i) << " "
+             << mesh.Cell1DsExtrema(1, i) << "\n";
+    }
+    file.close();
+}
+
+//Cella 2D
+void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename) {
+    std::ofstream file(filename);
+
+    for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
+        file << mesh.Cell2DsId[i] << " "
+             << mesh.Cell2DsNumVert[i] << " "
+             << mesh.Cell2DsNumEdg[i] << " ";
+
+        for (unsigned int v : mesh.Cell2DsVertices[i])
+            file << v << " ";
+
+        for (unsigned int e : mesh.Cell2DsEdges[i])
+            file << e << " ";
+
+        file << "\n";
+    }
+    file.close();
+}
+
+//Cella 3D
+void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename) {
+    std::ofstream file(filename);
+
+    for (unsigned int i = 0; i < mesh.NumCell3Ds; i++) {
+        file << mesh.Cell3DsId[i] << " ";
+        for (unsigned int f : mesh.Cell3DsFaces[i])
+            file << f << " ";
+        file << "\n";
+    }
+    file.close();
+}
 /*
 //funzione baricentro
 Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {

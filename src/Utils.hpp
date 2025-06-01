@@ -48,5 +48,13 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 
 void info_mesh(const PolygonalMesh& mesh);
 
+void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename);
+
+void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename);
+
+void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename);
+
+void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename);
+
 }
 
