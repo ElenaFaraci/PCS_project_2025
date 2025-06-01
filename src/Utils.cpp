@@ -298,7 +298,7 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		
 		
 	else{
-		cerr<<"valore di q non valido"<<endl;
+		cerr<<"valore non valido"<<endl;
 		return false;
 	}
 	return true;

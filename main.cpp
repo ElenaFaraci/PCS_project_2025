@@ -13,20 +13,42 @@ int main(){
 	PolygonalMesh mesh;
 	int p=3; // per ora non consideriamo altri casi se non 3
 	int q=4;
-	int b=1; //e se b=0 o 1...vedere
+	int b=3; //e se b=0 o 1...vedere
 	int c=0;
 	
+	// dobbiamo controllare l'input, positività, interi ecc...
 	
-	if (!valorizza_poliedro(q, mesh)){
-		cout<<"errore valorizzazione"<<endl;
+	bool flag_duale=false;
+	if (p==3){
+		if (!valorizza_poliedro(q, mesh)){
+			cerr<<"errore inserimento di q (secondo valore passato)"<<endl;
+			return 1;
+		}
+	} else if (q==3){
+		if (!valorizza_poliedro(p, mesh)){
+			cerr<<"errore inserimento di p (primo valore passato)"<<endl;
+			return 1;
+		}
+		int tmp=p;
+		p=q;
+		q=tmp;
+		flag_duale=true;
+		
+	} else{
+		cerr<<"ne p ne q (primi due valori passati) sono idonei"<< endl;
+		return 1;
 	}
+	
+	info_mesh(mesh);
+	
 	
 	
 	if (!controllo_lati_vertici (mesh)){
-		cout<<"fallisce controllo"<<endl;
+		cerr<<"fallisce controllo su consecutività lati e vertici"<<endl;
+		return 1;
 	}	
 		
-	// dobbiamo controllare l'input, positività, interi ecc...
+	
 	
 	if ((b+c)!=0 and (b==0 or c==0)){
 		if ((b+c)==1){
@@ -38,9 +60,12 @@ int main(){
 		cout<<"indici di triangolazione non validi per ora..."<<endl;
 	}
 	
+	
 	if (!controllo_lati_vertici (mesh)){
-		cout<<"fallisce controllo post triangolazione"<<endl;
-	}
+		cerr<<"fallisce controllo su consecutività lati e vertici post triangolazione"<<endl;
+		return 1;
+	}	
+	
 	
 	info_mesh(mesh);
 	
