@@ -306,6 +306,7 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 }
 
 
+
 bool controllo_lati_vertici (const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
 		//for (unsigned int j=0; j<(mesh.Cell2DsEdges[i]).size(); j++){
@@ -589,6 +590,22 @@ int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh) {
     return -1; 
 }
 
+//Proiezione su sfera unitaria e controllo 
+void proiezione_su_sfera_unitaria(PolygonalMesh& mesh) {
+    for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
+        Vector3d vertice = mesh.Cell0DsCoordinates.col(i);
+        vertice.normalize(); 
+        mesh.Cell0DsCoordinates.col(i) = vertice;
+    }
+	
+    for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
+        double r = mesh.Cell0DsCoordinates.col(i).norm();
+        if (std::abs(r - 1.0) > 1e-6) {
+            std::cerr << "il vertice " << i << " ha raggio = " << r << "\n";
+        }
+    }
+}
+	
 
 void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre){
 	
