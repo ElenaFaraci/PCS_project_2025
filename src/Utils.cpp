@@ -153,13 +153,13 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		
 		//Cell3D
 		
-		vector<unsigned int> Cell3DsNumVert = {6};
-		vector<unsigned int> Cell3DsNumEdg = {12};
-		vector<unsigned int> Cell3DsNumFaces = {8};
+		mesh.Cell3DsNumVert = 6;
+		mesh.Cell3DsNumEdg = 12;
+		mesh.Cell3DsNumFaces = 8;
 	
-		vector<unsigned int> Cell3DsVertices = {0, 1, 2, 3, 4, 5};
-		vector<unsigned int> Cell3DsEdges = {0,1,2,3,4,5,6,7,8,9,10,11};
-		vector<unsigned int> Cell3DsFaces = {0, 1 ,2, 3, 4, 5, 6, 7};
+		mesh.Cell3DsVertices = {0, 1, 2, 3, 4, 5};
+		mesh.Cell3DsEdges = {0,1,2,3,4,5,6,7,8,9,10,11};
+		mesh.Cell3DsFaces = {0, 1 ,2, 3, 4, 5, 6, 7};
 		}
 		
 		
@@ -286,13 +286,13 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		
 		//Cell3D
 		
-		vector<unsigned int> Cell3DsNumVert = {12};
-		vector<unsigned int> Cell3DsNumEdg = {30};
-		vector<unsigned int> Cell3DsNumFaces = {20};
+		mesh.Cell3DsNumVert = 12;
+		mesh.Cell3DsNumEdg = 30;
+		mesh.Cell3DsNumFaces = 20;
 	
-		vector<unsigned int> Cell3DsVertices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-		vector<unsigned int> Cell3DsEdges = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
-		vector<unsigned int> Cell3DsFaces = {0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+		mesh.Cell3DsVertices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+		mesh.Cell3DsEdges = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
+		mesh.Cell3DsFaces = {0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 		}
 		
 		
@@ -738,7 +738,6 @@ void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 2D
 void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
-
     for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
         file << mesh.Cell2DsId[i] << " "
              << mesh.Cell2DsNumVert[i] << " "
@@ -758,25 +757,29 @@ void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 3D
 void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
-
+	file << "Vertici:";
+	file << "\n";
     for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
-        for (unsigned int f : Cell3DsVertices[i]){
-            file << f << " ";
-        file << "\n";
-    }
+		file << mesh.Cell3DsVertices[i];
+		file << "\n";
+	}
+	file << "\n";
+	file << "Lati:";
+	file << "\n";
 	for (unsigned int j = 0; j < mesh.Cell3DsNumEdg; j++) {
-        for (unsigned int f : Cell3DsEdges[j]){
-            file << f << " ";
+		file << mesh.Cell3DsEdges[j];
         file << "\n";
-    }
+	}
+	file << "\n";
+	file << "Facce:";
+	file << "\n";
 	for (unsigned int k = 0; k < mesh.Cell3DsNumFaces; k++) {
-        for (unsigned int f : Cell3DsFaces[k]){
-            file << f << " ";
+        file << mesh.Cell3DsFaces[k];
         file << "\n";
-    }
-	
-    file.close();
+	}
+	file.close();
 }
+
 /*
 //funzione baricentro
 Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {
