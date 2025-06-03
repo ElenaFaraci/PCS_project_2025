@@ -759,12 +759,22 @@ void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename)
 void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
 
-    for (unsigned int i = 0; i < mesh.NumCell3Ds; i++) {
-        file << mesh.Cell3DsId[i] << " ";
-        for (unsigned int f : mesh.Cell3DsFaces[i])
+    for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
+        for (unsigned int f : Cell3DsVertices[i]){
             file << f << " ";
         file << "\n";
     }
+	for (unsigned int j = 0; j < mesh.Cell3DsNumEdg; j++) {
+        for (unsigned int f : Cell3DsEdges[j]){
+            file << f << " ";
+        file << "\n";
+    }
+	for (unsigned int k = 0; k < mesh.Cell3DsNumFaces; k++) {
+        for (unsigned int f : Cell3DsFaces[k]){
+            file << f << " ";
+        file << "\n";
+    }
+	
     file.close();
 }
 /*
