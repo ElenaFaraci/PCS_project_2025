@@ -46,6 +46,8 @@ int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh);
 
 void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre);
 
+void proiezione_su_sfera_unitaria(PolygonalMesh& mesh);
+
 void info_mesh(const PolygonalMesh& mesh);
 
 void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename);
