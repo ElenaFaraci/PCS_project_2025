@@ -39,12 +39,10 @@ int main(){
 		return 1;
 	}
 	
-<<<<<<< HEAD
+
 	// info_mesh(mesh);
 	
-=======
->>>>>>> eed64d1ba78da0ebe2e28bac1aff36540b5b36aa
-	
+
 	// effettuiamo il controllo di consecutivià
 	if (!controllo_lati_vertici (mesh)){
 		cerr<<"fallisce controllo su consecutività lati e vertici"<<endl;
@@ -80,16 +78,16 @@ int main(){
 	}
 	
 	
-	//info_mesh(mesh);
+	info_mesh(mesh);
 	string nome0 = "Cell0Ds.txt";
 	salvataggio_Cell0Ds(mesh, nome0);
 	string nome1 = "Cell1Ds.txt";
-	salvataggio_Cell2Ds(mesh, nome1);
+	salvataggio_Cell1Ds(mesh, nome1);
 	string nome2 = "Cell2Ds.txt";
 	salvataggio_Cell2Ds(mesh, nome2);
 	string nome3 = "Cell3Ds.txt";
 	salvataggio_Cell3Ds(mesh, nome3);
-	info_mesh(mesh);
+	
 	
 
 	Gedim::UCDUtilities utilities;
