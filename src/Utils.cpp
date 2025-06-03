@@ -750,12 +750,12 @@ void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename)
     }
     file.close();
 }
-/*
+
 //funzione baricentro
-Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords) {
+Eigen::Vector3d baricentro(const vector<unsigned int>& vertici, const PolygonalMesh& mesh) {
     Eigen::Vector3d b = Eigen::Vector3d::Zero();
-    for (size_t v : vertici) {
-        b += coords.col(v);
+    for (unsigned int v : vertici) {
+        b += mesh.Cell0DCoordinates.col(v);
     }
     return b / vertici.size();
 }
@@ -764,11 +764,11 @@ Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::Matr
 PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
     PolygonalMesh duale;
 
-    size_t num_facce = mesh.Cells2D.size(); // al posto del secondo membro posso direttamente scrivere NumCell2Ds
+    unsigned int num_facce = mesh.NumCell2Ds; // al posto del secondo membro posso direttamente scrivere NumCell2Ds
     duale.Cell0DCoordinates.resize(3, num_facce);
-
-    for (size_t i = 0; i < num_facce; ++i) {
-        duale.Cell0DCoordinates[i] = baricentro(mesh.Cell2DsVertices[i], mesh.Cell0DCoordinates);
+	// revisione fin qui
+    for (unsigned int i = 0; i < num_facce; i++) {
+        duale.Cell0DCoordinates[i] = baricentro(mesh.Cell2DsVertices[i], mesh);
     }
 
     size_t max_connessioni = num_facce * (num_facce - 1) / 2;
@@ -815,7 +815,7 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 
 
 	
-*/
+
 }
 /* TO DO: 1)lati e facce della triangolazione;
           2)affinare il duale;

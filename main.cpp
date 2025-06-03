@@ -39,17 +39,18 @@ int main(){
 		return 1;
 	}
 	
-	info_mesh(mesh);
+	// info_mesh(mesh);
 	
 	
-	
+	// effettuiamo il controllo di consecutivià
 	if (!controllo_lati_vertici (mesh)){
 		cerr<<"fallisce controllo su consecutività lati e vertici"<<endl;
 		return 1;
 	}	
 		
 	
-	
+	// di seguito verifichiamo la correttezza degli indici di triangolazione, 
+	// se sono corretti procediamo con la triangolazione
 	if ((b+c)!=0 and (b==0 or c==0)){
 		if ((b+c)==1){
 			cout<<"non c'è bisogno di fare triangolazione, gli indici sono b = "<<b<<" c = "<<c<<endl;
@@ -61,10 +62,19 @@ int main(){
 	}
 	
 	
+	// effettuiamo nuovamente il controllo di consecutivià
 	if (!controllo_lati_vertici (mesh)){
 		cerr<<"fallisce controllo su consecutività lati e vertici post triangolazione"<<endl;
 		return 1;
 	}	
+	
+	// nel caso in cui p!=3, ma q lecito, avevamo scambiato questi due indici 
+	// al fine di poter triangolare, ma ora dobbiamo "tornare indietro" per mezzo
+	// del duale
+	if (flag_duale){
+		cout<<"in questo caso dobbiamo passare al duale"<<endl;
+		
+	}
 	
 	
 	info_mesh(mesh);
