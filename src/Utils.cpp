@@ -860,16 +860,69 @@ vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh) 
 }
 
 
-
+/*
+DA FINIRE DI RIVEDERE
 vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
-										  const vector<unsigned int>& facce){
+										  const vector<unsigned int>& facce_vicinato_v){
 	
+	
+	if (facce_vicinato_v.size() <= 2)
+        return facce_vicinato_v;
+
+    map<unsigned int, vector<unsigned int>> adiacenze;
+
+    for (unsigned int i = 0; i < facce_vicinato_v.size(); i++) {
+        unsigned int fi = facce_vicinato_v[i];
+
+        for (unsigned int j = 0; j < facce_vicinato_v.size(); j++) {
+            if (i == j) continue;
+            unsigned int fj = facce_vicinato_v[j];
+
+            for (unsigned int a=0; a<mesh.Cell2DsEdges[fi].size(); a++) {
+				unsigned int ei=mesh.Cell2DsEdges[fi][a];
+                for (unsigned int b=0; b<mesh.Cell2DsEdges[fj].size(); b++) {
+					unsigned int ej=mesh.Cell2DsEdges[fj][b];
+                    if (ei == ej) {
+                        unsigned int v0 = mesh.Cell1DsExtrema(0, ei);
+						unsigned int v1 = mesh.Cell1DsExtrema(1, ei);
+
+                        if (v0 == v || v1 == v) {
+                            adiacenze[fi].push_back(fj);
+                        }
+                    }
+                }
+            }
+        }
+    }
+	//REVISIONE FIN QUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // Ordina ciclicamente le facce
+    vector<unsigned int> ordinato;
+    unordered_set<unsigned int> visitato;
+    unsigned int corrente = facce_vicinato_v[0];
+
+    while (ordinato.size() < facce_vicinato_v.size()) {
+        ordinato.push_back(corrente);
+        visitato.insert(corrente);
+
+        bool trovato = false;
+        for (unsigned int vicina : adiacenze[corrente]) {
+            if (!visitato.count(vicina)) {
+                corrente = vicina;
+                trovato = true;
+                break;
+            }
+        }
+
+        if (!trovato) break; // Caso limite: facce non ben collegate
+    }
+
+    return ordinato;
 	
 	
 	
 	
 }
-
+*/
 
 //funzione duale
 
@@ -936,14 +989,14 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	duale.Cell2DsVertices.resize(duale.NumCell2Ds);
     duale.Cell2DsId.resize(duale.NumCell2Ds);
 	
-	 for (unsigned int v = 0; v < mesh.NumCell0Ds; v++) {
-		// facce che contengono il vertice v di mesh
-        vector<unsigned int> facce = facce_per_vertice[v];
-        vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
+	//for (unsigned int v = 0; v < mesh.NumCell0Ds; v++) {
+	//	// facce che contengono il vertice v di mesh
+    //    vector<unsigned int> facce = facce_per_vertice[v];
+    //    vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
 
-        duale.Cell2DsVertices[v] = facce_ordinate;
-        duale.Cell2DsId[v] = v;
-    }
+    //    duale.Cell2DsVertices[v] = facce_ordinate;
+    //    duale.Cell2DsId[v] = v;
+    //}
 	
 	
 	
