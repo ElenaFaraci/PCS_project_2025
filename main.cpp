@@ -11,8 +11,9 @@ using namespace PolygonalLibrary;
 int main(){
 	
 	PolygonalMesh mesh;
-	int p=3; // per ora non consideriamo altri casi se non 3
-	int q=4;
+	PolygonalMesh duale;
+	int p=4; // per ora non consideriamo altri casi se non 3
+	int q=3;
 	int b=3; //e se b=0 o 1...vedere
 	int c=0;
 	
@@ -39,14 +40,19 @@ int main(){
 		return 1;
 	}
 	
+
+	// info_mesh(mesh);
 	
+
+	// effettuiamo il controllo di consecutivià
 	if (!controllo_lati_vertici (mesh)){
 		cerr<<"fallisce controllo su consecutività lati e vertici"<<endl;
 		return 1;
 	}	
 		
 	
-	
+	// di seguito verifichiamo la correttezza degli indici di triangolazione, 
+	// se sono corretti procediamo con la triangolazione
 	if ((b+c)!=0 and (b==0 or c==0)){
 		if ((b+c)==1){
 			cout<<"non c'è bisogno di fare triangolazione, gli indici sono b = "<<b<<" c = "<<c<<endl;
@@ -58,22 +64,37 @@ int main(){
 	}
 	
 	
+	// effettuiamo nuovamente il controllo di consecutivià
 	if (!controllo_lati_vertici (mesh)){
 		cerr<<"fallisce controllo su consecutività lati e vertici post triangolazione"<<endl;
 		return 1;
 	}	
+	
+	// nel caso in cui p!=3, ma q lecito, avevamo scambiato questi due indici 
+	// al fine di poter triangolare, ma ora dobbiamo "tornare indietro" per mezzo
+	// del duale
+	
+	info_mesh(mesh);
+	
+	if (flag_duale){
+		cout<<"in questo caso dobbiamo passare al duale"<<endl;
+		duale = CostruisciDualeMesh(mesh);
+		
+		
+	}
+	info_mesh(duale);
 	
 	
 	//info_mesh(mesh);
 	string nome0 = "Cell0Ds.txt";
 	salvataggio_Cell0Ds(mesh, nome0);
 	string nome1 = "Cell1Ds.txt";
-	salvataggio_Cell2Ds(mesh, nome1);
+	salvataggio_Cell1Ds(mesh, nome1);
 	string nome2 = "Cell2Ds.txt";
 	salvataggio_Cell2Ds(mesh, nome2);
 	string nome3 = "Cell3Ds.txt";
 	salvataggio_Cell3Ds(mesh, nome3);
-	info_mesh(mesh);
+	
 	
 
 	Gedim::UCDUtilities utilities;
