@@ -11,8 +11,9 @@ using namespace PolygonalLibrary;
 int main(){
 	
 	PolygonalMesh mesh;
-	int p=3; // per ora non consideriamo altri casi se non 3
-	int q=4;
+	PolygonalMesh duale;
+	int p=4; // per ora non consideriamo altri casi se non 3
+	int q=3;
 	int b=3; //e se b=0 o 1...vedere
 	int c=0;
 	
@@ -72,13 +73,19 @@ int main(){
 	// nel caso in cui p!=3, ma q lecito, avevamo scambiato questi due indici 
 	// al fine di poter triangolare, ma ora dobbiamo "tornare indietro" per mezzo
 	// del duale
-	if (flag_duale){
-		cout<<"in questo caso dobbiamo passare al duale"<<endl;
-		
-	}
-	
 	
 	info_mesh(mesh);
+	
+	if (flag_duale){
+		cout<<"in questo caso dobbiamo passare al duale"<<endl;
+		duale = CostruisciDualeMesh(mesh);
+		
+		
+	}
+	info_mesh(duale);
+	
+	
+	//info_mesh(mesh);
 	string nome0 = "Cell0Ds.txt";
 	salvataggio_Cell0Ds(mesh, nome0);
 	string nome1 = "Cell1Ds.txt";

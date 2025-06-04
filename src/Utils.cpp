@@ -735,7 +735,7 @@ void info_mesh(const PolygonalMesh& mesh){
 	cout << "Numero di lati: " << mesh.Cell3DsNumEdg << endl;
 	cout << "Numero di facce: " << mesh.Cell3DsNumFaces << endl;
 	
-	cout << "Vertici:";
+	cout << "Vertici:"<<endl;
 	for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
 		cout << mesh.Cell3DsVertices[i];
 		cout << "\n";
@@ -833,50 +833,50 @@ void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename)
 
 
 //funzione baricentro
-/*
+
 Eigen::Vector3d baricentro(const vector<unsigned int>& vertici, const PolygonalMesh& mesh) {
     Eigen::Vector3d b = Eigen::Vector3d::Zero();
     for (unsigned int v : vertici) {
-        b += mesh.Cell0DCoordinates.col(v);
+        b += mesh.Cell0DsCoordinates.col(v);
     }
     return b / vertici.size();
 }
-*/
+
 
 
 //funzione duale
 
-/*
+
 PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
     PolygonalMesh duale;
 
-    unsigned int num_facce = mesh.NumCell2Ds; // al posto del secondo membro posso direttamente scrivere NumCell2Ds
-    duale.Cell0DCoordinates.resize(3, num_facce);
-	// revisione fin qui
+    unsigned int num_facce = mesh.NumCell2Ds; 
+	duale.NumCell0Ds=num_facce;
+    duale.Cell0DsCoordinates.resize(3, num_facce);
+	
     for (unsigned int i = 0; i < num_facce; i++) {
-        duale.Cell0DCoordinates[i] = baricentro(mesh.Cell2DsVertices[i], mesh);
+        duale.Cell0DsCoordinates.col(i) = baricentro(mesh.Cell2DsVertices[i], mesh);
     }
+	
+    unsigned int max_connessioni = num_facce * (num_facce - 1) / 2;
+    // duale.Cells1D.resize(max_connessioni); NON CAPISCO
+	duale.Cell1DsExtrema.resize(2,max_connessioni);
 
-    size_t max_connessioni = num_facce * (num_facce - 1) / 2;
-    duale.Cells1D.resize(max_connessioni);
+    unsigned int count = 0;
 
-    size_t count = 0;
+    for (unsigned int i = 0; i < num_facce; i++) {
+        vector<unsigned int> faccia_i = mesh.Cell2DsEdges[i];
 
-    for (size_t i = 0; i < num_facce; ++i) {
-        const std::vector<size_t>& faccia_i = Cells2DEdges[i];
-
-        for (size_t j = i + 1; j < num_facce; ++j) {
-            const std::vector<size_t>& faccia_j = Cells2DEdges[j];
+        for (unsigned int j = i + 1; j < num_facce; ++j) {
+            vector<unsigned int> faccia_j = mesh.Cell2DsEdges[j];
 
             bool adiacenti = false;
 
-            for (size_t a = 0; a < faccia_i.size(); ++a) {
-                size_t vi1 = faccia_i[a];
-                //size_t vi2 = faccia_i[(a + 1) % faccia_i.size()];
-
-                for (size_t b = 0; b < faccia_j.size(); ++b) {
-                    size_t vj1 = faccia_j[b];
-                    //size_t vj2 = faccia_j[(b + 1) % faccia_j.size()];
+            for (unsigned int a = 0; a < faccia_i.size(); a++) {
+                unsigned int vi1 = faccia_i[a];
+                
+                for (unsigned int b = 0; b < faccia_j.size(); b++) {
+                    unsigned int vj1 = faccia_j[b];
 
                     if (vi1 == vj1){
                         adiacenti = true;
@@ -888,17 +888,21 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
             }
 
             if (adiacenti) {
-                duale.Cell1DsExtrema.col(count) << i, j;;
-                ++count;
+                duale.Cell1DsExtrema.col(count) << i, j;
+                count++;
             }
         }
     }
 
-    duale.Cell1DsExtrema.conservativeResize(2,count);
-
+    duale.NumCell1Ds=count;
+	duale.Cell1DsExtrema.conservativeResize(2,count);
+	duale.Cell1DsId.resize(count);
+	iota(duale.Cell1DsId.begin(), duale.Cell1DsId.end(), 0);
+	
     return duale;
+	
 }
-*/
+
 
 	
 
