@@ -763,6 +763,13 @@ void info_mesh(const PolygonalMesh& mesh){
 //Cella 0D
 void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
+	file << "Identificativi: ";
+	file << "\n";
+	for (unsigned int j = 0; j< mesh.NumCell0Ds; j++){
+		file << mesh.Cell0DsId[j];
+		file << "\n";
+	}
+	file << "\n";
 	file << "Coordinate";
 	file << "\n";
     for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
@@ -775,7 +782,14 @@ void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 1D
 void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
-	file << "Extrema:";
+	file << "Identificativi: ";
+	file << "\n";
+	for (unsigned int j = 0; j< mesh.NumCell1Ds; j++){
+		file << mesh.Cell1DsId[j];
+		file << "\n";
+	}
+	file << "\n";
+	file << "ID Vertici:";
 	file << "\n";
     for (unsigned int i = 0; i < mesh.NumCell1Ds; i++) {
 		file << mesh.Cell1DsExtrema.col(i)[0] << " " << mesh.Cell1DsExtrema.col(i)[1];
@@ -787,12 +801,23 @@ void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 2D
 void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
+	file << "Identificativi: ";
+	file << "\n";
+	for (unsigned int z = 0; z< mesh.NumCell2Ds; z++){
+		file << mesh.Cell2DsId[z];
+		file << "\n";
+	}
+	file << "\n";
+	file << "Numero Vertici: "<< " " << mesh.NumCell2Ds;
+	file << "\n";
 	file << "Vertici:";
 	file <<"\n";
     for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
 		file << mesh.Cell2DsVertices[i][0] << " " << mesh.Cell2DsVertices[i][1] << " "<< mesh.Cell2DsVertices[i][2];
 		file << "\n";
 	}
+	file << "\n";
+	file << "Numero Lati: "<< " " << mesh.NumCell2Ds;
 	file <<"\n";
 	file << "Lati:";
 	file <<"\n";
@@ -807,6 +832,8 @@ void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 3D
 void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
+	file << "Numero Vertici: "<< " " << mesh.Cell3DsNumVert;
+	file << "\n";
 	file << "Vertici:";
 	file << "\n";
     for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
@@ -814,12 +841,16 @@ void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename)
 		file << "\n";
 	}
 	file << "\n";
+	file << "Numero Lati: "<< " " << mesh.Cell3DsNumEdg;
+	file << "\n";
 	file << "Lati:";
 	file << "\n";
 	for (unsigned int j = 0; j < mesh.Cell3DsNumEdg; j++) {
 		file << mesh.Cell3DsEdges[j];
         file << "\n";
 	}
+	file << "\n";
+	file << "Numero Facce: "<< " " << mesh.Cell3DsNumFaces;
 	file << "\n";
 	file << "Facce:";
 	file << "\n";
