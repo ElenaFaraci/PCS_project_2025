@@ -842,6 +842,33 @@ Eigen::Vector3d baricentro(const vector<unsigned int>& vertici, const PolygonalM
     return b / vertici.size();
 }
 
+// la seguente funzione crea un vettore di vettori. il vettore in posizione 
+// i, cioe facce_per_vertice[i], contiene l'elenco delle facce nelle quali 
+// è presente il vertice i
+// ATTENZIONE: i vertici e facce a cui mi riferisco sono quelli della 
+// 	           mesh, serviranno poi per il duale.
+vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh) {
+    vector<vector<unsigned int>> facce_per_vertice(mesh.NumCell0Ds);
+
+    for (unsigned int i = 0; i < mesh.NumCell2Ds; ++i) {
+        for (unsigned int v : mesh.Cell2DsVertices[i]) {
+            facce_per_vertice[v].push_back(i);
+        }
+    }
+
+    return facce_per_vertice;
+}
+
+
+
+vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
+										  const vector<unsigned int>& facce){
+	
+	
+	
+	
+	
+}
 
 
 //funzione duale
@@ -854,12 +881,14 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	duale.NumCell0Ds=num_facce;
     duale.Cell0DsCoordinates.resize(3, num_facce);
 	
+	// creo i vertici del duale, sono i baricentri delle facce di mesh
     for (unsigned int i = 0; i < num_facce; i++) {
         duale.Cell0DsCoordinates.col(i) = baricentro(mesh.Cell2DsVertices[i], mesh);
     }
 	
+	// trovo i lati del duale, posso connettere due baricentri, solo se 
+	// le due facce che li generano sono adiacenti, cioè hanno un lato in comune
     unsigned int max_connessioni = num_facce * (num_facce - 1) / 2;
-    // duale.Cells1D.resize(max_connessioni); NON CAPISCO
 	duale.Cell1DsExtrema.resize(2,max_connessioni);
 
     unsigned int count = 0;
@@ -898,6 +927,25 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	duale.Cell1DsExtrema.conservativeResize(2,count);
 	duale.Cell1DsId.resize(count);
 	iota(duale.Cell1DsId.begin(), duale.Cell1DsId.end(), 0);
+	
+	// passo ora a costruire le facce del duale
+	
+	vector<vector<unsigned int>> facce_per_vertice = trova_facce_per_vertice(mesh);
+	
+	duale.NumCell2Ds=mesh.NumCell0Ds;
+	duale.Cell2DsVertices.resize(duale.NumCell2Ds);
+    duale.Cell2DsId.resize(duale.NumCell2Ds);
+	
+	 for (unsigned int v = 0; v < mesh.NumCell0Ds; v++) {
+		// facce che contengono il vertice v di mesh
+        vector<unsigned int> facce = facce_per_vertice[v];
+        vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
+
+        duale.Cell2DsVertices[v] = facce_ordinate;
+        duale.Cell2DsId[v] = v;
+    }
+	
+	
 	
     return duale;
 	
