@@ -763,18 +763,16 @@ void info_mesh(const PolygonalMesh& mesh){
 //Cella 0D
 void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
-	file << "Identificativi: ";
-	file << "\n";
+	file << "-- Cell0D --"<<endl<<endl;
+	file << "Numero di Cell0Ds: " << mesh.NumCell0Ds <<endl << endl;
+	file << "Identificativi: "<< endl <<endl;
 	for (unsigned int j = 0; j< mesh.NumCell0Ds; j++){
-		file << mesh.Cell0DsId[j];
-		file << "\n";
+		file << mesh.Cell0DsId[j]<<endl;
 	}
 	file << "\n";
-	file << "Coordinate";
-	file << "\n";
+	file << "Coordinate: "<<endl<<endl;
     for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
-		file << mesh.Cell0DsCoordinates.col(i)[0] << " "<< mesh.Cell0DsCoordinates.col(i)[1];
-		file << "\n";
+		file << mesh.Cell0DsCoordinates.col(i)[0] << " "<< mesh.Cell0DsCoordinates.col(i)[1]<<endl;
     }
     file.close();
 }
@@ -782,18 +780,16 @@ void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 1D
 void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
-	file << "Identificativi: ";
-	file << "\n";
+	file << "-- Cell1D --"<<endl<<endl;
+	file << "Numero di Cell1Ds: " << mesh.NumCell1Ds <<endl << endl;
+	file << "Identificativi: "<<endl<<endl;
 	for (unsigned int j = 0; j< mesh.NumCell1Ds; j++){
-		file << mesh.Cell1DsId[j];
-		file << "\n";
+		file << mesh.Cell1DsId[j]<<endl;
 	}
 	file << "\n";
-	file << "ID Vertici:";
-	file << "\n";
+	file << "ID Vertici:"<<endl<<endl;
     for (unsigned int i = 0; i < mesh.NumCell1Ds; i++) {
-		file << mesh.Cell1DsExtrema.col(i)[0] << " " << mesh.Cell1DsExtrema.col(i)[1];
-		file << "\n";
+		file << mesh.Cell1DsExtrema.col(i)[0] << " " << mesh.Cell1DsExtrema.col(i)[1]<<endl;
     }
     file.close();
 }
@@ -801,29 +797,23 @@ void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 2D
 void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
-	file << "Identificativi: ";
-	file << "\n";
+	file << "-- Cell2D --"<<endl<<endl;
+	file << "Numero di Cell2Ds: " << mesh.NumCell2Ds <<endl << endl;
+	file << "Identificativi: "<<endl<<endl;
 	for (unsigned int z = 0; z< mesh.NumCell2Ds; z++){
-		file << mesh.Cell2DsId[z];
-		file << "\n";
+		file << mesh.Cell2DsId[z]<<endl;
 	}
 	file << "\n";
-	file << "Numero Vertici: "<< " " << mesh.NumCell2Ds;
-	file << "\n";
-	file << "Vertici:";
-	file <<"\n";
+	file << "Numero Vertici: "<< " " << mesh.NumCell2Ds<<endl<<endl;
+	file << "Vertici:"<<endl<<endl;
     for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
-		file << mesh.Cell2DsVertices[i][0] << " " << mesh.Cell2DsVertices[i][1] << " "<< mesh.Cell2DsVertices[i][2];
-		file << "\n";
+		file << mesh.Cell2DsVertices[i][0] << " " << mesh.Cell2DsVertices[i][1] << " "<< mesh.Cell2DsVertices[i][2]<<endl;
 	}
 	file << "\n";
-	file << "Numero Lati: "<< " " << mesh.NumCell2Ds;
-	file <<"\n";
-	file << "Lati:";
-	file <<"\n";
+	file << "Numero Lati: "<< " " << mesh.NumCell2Ds<<endl<<endl;
+	file << "Lati:"<<endl<<endl;
 	for (unsigned int j = 0; j < mesh.NumCell2Ds; j++) {
-		file << mesh.Cell2DsEdges[j][0] << " " << mesh.Cell2DsEdges[j][1] << " "<< mesh.Cell2DsEdges[j][2];
-		file << "\n";
+		file << mesh.Cell2DsEdges[j][0] << " " << mesh.Cell2DsEdges[j][1] << " "<< mesh.Cell2DsEdges[j][2]<<endl;
 	}
 	
     file.close();
@@ -832,31 +822,24 @@ void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename)
 //Cella 3D
 void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
-	file << "Numero Vertici: "<< " " << mesh.Cell3DsNumVert;
-	file << "\n";
-	file << "Vertici:";
-	file << "\n";
+	file << "-- Cell3D --"<<endl<<endl;
+	file << "Numero di Cell3Ds: " << mesh.NumCell3Ds <<endl << endl;
+	file << "Numero Vertici: "<< " " << mesh.Cell3DsNumVert<<endl<<endl;
+	file << "Vertici:"<<endl<<endl;
     for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
-		file << mesh.Cell3DsVertices[i];
-		file << "\n";
+		file << mesh.Cell3DsVertices[i]<<endl;
 	}
 	file << "\n";
-	file << "Numero Lati: "<< " " << mesh.Cell3DsNumEdg;
-	file << "\n";
-	file << "Lati:";
-	file << "\n";
+	file << "Numero Lati: "<< " " << mesh.Cell3DsNumEdg<<endl<<endl;
+	file << "Lati:"<<endl<<endl;
 	for (unsigned int j = 0; j < mesh.Cell3DsNumEdg; j++) {
-		file << mesh.Cell3DsEdges[j];
-        file << "\n";
+		file << mesh.Cell3DsEdges[j]<<endl;
 	}
 	file << "\n";
-	file << "Numero Facce: "<< " " << mesh.Cell3DsNumFaces;
-	file << "\n";
-	file << "Facce:";
-	file << "\n";
+	file << "Numero Facce: "<< " " << mesh.Cell3DsNumFaces<<endl<<endl;
+	file << "Facce:"<<endl<<endl;
 	for (unsigned int k = 0; k < mesh.Cell3DsNumFaces; k++) {
-        file << mesh.Cell3DsFaces[k];
-        file << "\n";
+        file << mesh.Cell3DsFaces[k]<<endl;
 	}
 	file.close();
 }
