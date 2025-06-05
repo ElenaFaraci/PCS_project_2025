@@ -5,6 +5,7 @@
 #include <cmath>
 #include "Eigen/Eigen"
 #include <numeric>
+
 /*
 SCALETTA:
 main, cmake, gitignore, finire poliedri (questa settimana)
@@ -281,7 +282,7 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		vector<unsigned int> e17 = {5,14,6};
 		vector<unsigned int> e18 = {14,23,17};
 		vector<unsigned int> e19 = {21,27,23};
-		vector<unsigned int> e20 = {0,11,4};
+		vector<unsigned int> e20 = {0,11,2};
 		
 		mesh.Cell2DsEdges = {e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20};
 		
@@ -311,40 +312,42 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 bool controllo_lati_vertici (const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
 		//for (unsigned int j=0; j<(mesh.Cell2DsEdges[i]).size(); j++){
-		for (unsigned int j=0; j<3; j++){
+		for (unsigned int j = 0; j<3; j++){
 			
 			unsigned int id_vertice = mesh.Cell2DsVertices[i][j];
-			unsigned int id_lato=mesh.Cell2DsEdges[i][j];
+			unsigned int id_lato = mesh.Cell2DsEdges[i][j];
 			//unsigned int id_lato_succ=mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
-			unsigned int id_lato_succ=mesh.Cell2DsEdges[i][(j+1)%3];
-			unsigned int count =0;
+			unsigned int id_lato_succ = mesh.Cell2DsEdges[i][(j+1)%3];
+			unsigned int count = 0;
 			
 			//Controllo Lati
-			if (mesh.Cell1DsExtrema(0,id_lato)==mesh.Cell1DsExtrema(0,id_lato_succ))
-				count++;
-			if (mesh.Cell1DsExtrema(0,id_lato)==mesh.Cell1DsExtrema(1,id_lato_succ))
-				count++;
-			if (mesh.Cell1DsExtrema(1,id_lato)==mesh.Cell1DsExtrema(0,id_lato_succ))
-				count++;
-			if (mesh.Cell1DsExtrema(1,id_lato)==mesh.Cell1DsExtrema(1,id_lato_succ))
-				count++;
+			if (mesh.Cell1DsExtrema(0, id_lato) == mesh.Cell1DsExtrema(0, id_lato_succ))
+                count++;
+            if (mesh.Cell1DsExtrema(0, id_lato) == mesh.Cell1DsExtrema(1, id_lato_succ))
+                count++;
+            if (mesh.Cell1DsExtrema(1, id_lato) == mesh.Cell1DsExtrema(0, id_lato_succ))
+                count++;
+            if (mesh.Cell1DsExtrema(1, id_lato) == mesh.Cell1DsExtrema(1, id_lato_succ))
+                count++;
+
+            if (count != 1) {
+                std::cout << "Errore nei lati: count = " << count << " i = " << i << " j = " << j << std::endl;
+                return false;
+            }
+
 			
-			if (count != 1){
-				cout<<"lati: "<<count<<" i: "<<i<<" j: "<<j<<endl;
-				
-				return false;
-			}
 			
 			// Controllo Vertici
-			if (id_vertice == mesh.Cell1DsExtrema(0,id_lato))
-				count++;
-			if (id_vertice == mesh.Cell1DsExtrema(1,id_lato))
-				count++;
-			
-			if (count != 2){
-				cout<<"vertici: "<<count<<" i: "<<i<<" j: "<<j<<endl;
-				return false;
-			}
+			count = 0;
+            if (id_vertice == mesh.Cell1DsExtrema(0, id_lato))
+                count++;
+            if (id_vertice == mesh.Cell1DsExtrema(1, id_lato))
+                count++;
+
+            if (count != 1) {
+                std::cout << "Errore nei vertici: count = " << count << " i = " << i << " j = " << j << std::endl;
+                return false;
+            }
 			
 		}
 			
