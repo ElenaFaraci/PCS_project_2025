@@ -775,7 +775,7 @@ void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename)
 	file << "\n";
 	file << "Coordinate: "<<endl<<endl;
     for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
-		file << mesh.Cell0DsCoordinates.col(i)[0] << " "<< mesh.Cell0DsCoordinates.col(i)[1]<<endl;
+		file << mesh.Cell0DsCoordinates.col(i)[0] << " "<< mesh.Cell0DsCoordinates.col(i)[1]<<" "<<mesh.Cell0DsCoordinates.col(i)[2]<<endl;
     }
     file.close();
 }

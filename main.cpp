@@ -13,9 +13,11 @@ int main(){
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
 	int p=3; // per ora non consideriamo altri casi se non 3
-	int q=3;
+	int q=5;
 	int b=3; //e se b=0 o 1...vedere
 	int c=0;
+	unsigned int id1 = 0;
+	unsigned int id2 = 0;
 	
 	// dobbiamo controllare l'input, positività, interi ecc...
 	
