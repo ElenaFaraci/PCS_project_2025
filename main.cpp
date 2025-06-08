@@ -12,9 +12,9 @@ int main(){
 	
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
-	int p=3; // per ora non consideriamo altri casi se non 3
-	int q=5;
-	int b=3; //e se b=0 o 1...vedere
+	int p=4; // per ora non consideriamo altri casi se non 3
+	int q=3;
+	int b=1; //e se b=0 o 1...vedere
 	int c=0;
 	unsigned int id1 = 0;
 	unsigned int id2 = 0;
@@ -81,10 +81,21 @@ int main(){
 	if (flag_duale){
 		cout<<"in questo caso dobbiamo passare al duale"<<endl;
 		duale = CostruisciDualeMesh(mesh);
-		
-		
+		info_mesh(duale);
+		Gedim::UCDUtilities utilities;
+    {   
+        utilities.ExportPoints("./Cell0Ds_duale.inp",
+                               duale.Cell0DsCoordinates);
+    }
+
+    {
+        utilities.ExportSegments("./Cell1Ds_duale.inp",
+                                 duale.Cell0DsCoordinates,
+                                 duale.Cell1DsExtrema,
+                                 {});
+    }
 	}
-	info_mesh(duale);
+	
 	
 	
 	//info_mesh(mesh);

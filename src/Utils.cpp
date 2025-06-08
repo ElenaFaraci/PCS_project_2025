@@ -5,6 +5,7 @@
 #include <cmath>
 #include "Eigen/Eigen"
 #include <numeric>
+#include <unordered_set>
 
 /*
 SCALETTA:
@@ -737,7 +738,7 @@ void info_mesh(const PolygonalMesh& mesh){
 	cout << "Numero di vertici: " << mesh.Cell3DsNumVert << endl;
 	cout << "Numero di lati: " << mesh.Cell3DsNumEdg << endl;
 	cout << "Numero di facce: " << mesh.Cell3DsNumFaces << endl;
-	
+	/*
 	cout << "Vertici:"<<endl;
 	for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
 		cout << mesh.Cell3DsVertices[i];
@@ -757,7 +758,7 @@ void info_mesh(const PolygonalMesh& mesh){
         cout << mesh.Cell3DsFaces[k];
         cout << "\n";
 	}
-
+	*/
 	cout<<endl;
     cout << "==========================\n";
 
@@ -877,15 +878,19 @@ vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh) 
 }
 
 
-/*
-DA FINIRE DI RIVEDERE
+
+//DA FINIRE DI RIVEDERE
 vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
 										  const vector<unsigned int>& facce_vicinato_v){
 	
 	
 	if (facce_vicinato_v.size() <= 2)
         return facce_vicinato_v;
-
+	
+	// la mappa adiacenze, ha come chiave l'id di una faccia. 
+	// nel vettore associato ad una chiave, sono presenti gli id delle 
+	// facce adiacenti (che condividono un lato) a quella in chiave
+	// OSS: le facce prese in consderazione sono solo quelle del vicinato di v (?sicuro?)
     map<unsigned int, vector<unsigned int>> adiacenze;
 
     for (unsigned int i = 0; i < facce_vicinato_v.size(); i++) {
@@ -912,10 +917,16 @@ vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned in
         }
     }
 	//REVISIONE FIN QUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Ordina ciclicamente le facce
+    // Ordino ciclicamente le facce
     vector<unsigned int> ordinato;
     unordered_set<unsigned int> visitato;
     unsigned int corrente = facce_vicinato_v[0];
+	
+	// il vector "ordinato" conterrà gli id delle facce attorno a v, ordinati ciclicamente
+	// per prima cosa aggiungiamo ad ordinato la faccia zero memorizzata in facce_vicinato_v
+	// dunque tra le sue vicime memorizzare in adiacenza, prendiamo quella che non 
+	// abbiamo ancora visitato, o comunque la prima disponibile
+	// si procede cercando la successiava della faccia corrente.
 
     while (ordinato.size() < facce_vicinato_v.size()) {
         ordinato.push_back(corrente);
@@ -939,7 +950,7 @@ vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned in
 	
 	
 }
-*/
+
 
 //funzione duale
 
@@ -1006,14 +1017,14 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	duale.Cell2DsVertices.resize(duale.NumCell2Ds);
     duale.Cell2DsId.resize(duale.NumCell2Ds);
 	
-	//for (unsigned int v = 0; v < mesh.NumCell0Ds; v++) {
-	//	// facce che contengono il vertice v di mesh
-    //    vector<unsigned int> facce = facce_per_vertice[v];
-    //    vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
+	for (unsigned int v = 0; v < mesh.NumCell0Ds; v++) {
+		// facce che contengono il vertice v di mesh
+        vector<unsigned int> facce = facce_per_vertice[v];
+        vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
 
-    //    duale.Cell2DsVertices[v] = facce_ordinate;
-    //    duale.Cell2DsId[v] = v;
-    //}
+        duale.Cell2DsVertices[v] = facce_ordinate;
+        duale.Cell2DsId[v] = v;
+    }
 	
 	
 	
