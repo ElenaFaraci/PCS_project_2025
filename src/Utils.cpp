@@ -5,6 +5,7 @@
 #include <cmath>
 #include "Eigen/Eigen"
 #include <numeric>
+#include <unordered_set>
 
 /*
 SCALETTA:
@@ -155,6 +156,7 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		
 		//Cell3D
 		
+		mesh.Cell3DsId=0;
 		mesh.Cell3DsNumVert = 6;
 		mesh.Cell3DsNumEdg = 12;
 		mesh.Cell3DsNumFaces = 8;
@@ -288,6 +290,7 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 		
 		//Cell3D
 		
+		mesh.Cell3DsId=0;
 		mesh.Cell3DsNumVert = 12;
 		mesh.Cell3DsNumEdg = 30;
 		mesh.Cell3DsNumFaces = 20;
@@ -311,13 +314,13 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 
 bool controllo_lati_vertici (const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
-		//for (unsigned int j=0; j<(mesh.Cell2DsEdges[i]).size(); j++){
-		for (unsigned int j = 0; j<3; j++){
+		
+		for (unsigned int j = 0; j<(mesh.Cell2DsEdges[i]).size(); j++){
 			
 			unsigned int id_vertice = mesh.Cell2DsVertices[i][j];
 			unsigned int id_lato = mesh.Cell2DsEdges[i][j];
-			//unsigned int id_lato_succ=mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
-			unsigned int id_lato_succ = mesh.Cell2DsEdges[i][(j+1)%3];
+			unsigned int id_lato_succ=mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
+			
 			unsigned int count = 0;
 			
 			//Controllo Lati
@@ -331,7 +334,7 @@ bool controllo_lati_vertici (const PolygonalMesh& mesh){
                 count++;
 
             if (count != 1) {
-                std::cout << "Errore nei lati: count = " << count << " i = " << i << " j = " << j << std::endl;
+                cout << "Errore nei lati: count = " << count << " i = " << i << " j = " << j << std::endl;
                 return false;
             }
 
@@ -737,7 +740,7 @@ void info_mesh(const PolygonalMesh& mesh){
 	cout << "Numero di vertici: " << mesh.Cell3DsNumVert << endl;
 	cout << "Numero di lati: " << mesh.Cell3DsNumEdg << endl;
 	cout << "Numero di facce: " << mesh.Cell3DsNumFaces << endl;
-	
+	/*
 	cout << "Vertici:"<<endl;
 	for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
 		cout << mesh.Cell3DsVertices[i];
@@ -757,7 +760,7 @@ void info_mesh(const PolygonalMesh& mesh){
         cout << mesh.Cell3DsFaces[k];
         cout << "\n";
 	}
-
+	*/
 	cout<<endl;
     cout << "==========================\n";
 
@@ -877,15 +880,19 @@ vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh) 
 }
 
 
-/*
-DA FINIRE DI RIVEDERE
 vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
 										  const vector<unsigned int>& facce_vicinato_v){
 	
 	
 	if (facce_vicinato_v.size() <= 2)
         return facce_vicinato_v;
-
+	
+	// la mappa adiacenze, ha come chiave l'id di una faccia. 
+	// nel vettore associato ad una chiave, sono presenti gli id delle 
+	// facce adiacenti (che condividono un lato) a quella in chiave
+	// OSS: le facce prese in consderazione sono solo quelle del vicinato di v
+	// in pratica, due facce sono adiacenti (in questo contesto) se condividono un 
+	// lato, che ha come un estremo proprio v
     map<unsigned int, vector<unsigned int>> adiacenze;
 
     for (unsigned int i = 0; i < facce_vicinato_v.size(); i++) {
@@ -911,11 +918,17 @@ vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned in
             }
         }
     }
-	//REVISIONE FIN QUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Ordina ciclicamente le facce
+
+    // Ordino ciclicamente le facce
     vector<unsigned int> ordinato;
     unordered_set<unsigned int> visitato;
     unsigned int corrente = facce_vicinato_v[0];
+	
+	// il vector "ordinato" conterrà gli id delle facce attorno a v, ordinati ciclicamente
+	// per prima cosa aggiungiamo ad ordinato la faccia zero memorizzata in facce_vicinato_v
+	// dunque tra le sue vicime memorizzare in adiacenza, prendiamo quella che non 
+	// abbiamo ancora visitato, o comunque la prima disponibile
+	// si procede cercando la successiava della faccia corrente.
 
     while (ordinato.size() < facce_vicinato_v.size()) {
         ordinato.push_back(corrente);
@@ -939,7 +952,7 @@ vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned in
 	
 	
 }
-*/
+
 
 //funzione duale
 
@@ -955,6 +968,8 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
     for (unsigned int i = 0; i < num_facce; i++) {
         duale.Cell0DsCoordinates.col(i) = baricentro(mesh.Cell2DsVertices[i], mesh);
     }
+	duale.Cell0DsId.resize(num_facce);
+	iota(duale.Cell0DsId.begin(), duale.Cell0DsId.end(), 0);
 	
 	// trovo i lati del duale, posso connettere due baricentri, solo se 
 	// le due facce che li generano sono adiacenti, cioè hanno un lato in comune
@@ -987,6 +1002,7 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
             }
 
             if (adiacenti) {
+				// OSS: grazie al fatto che j>i, potrò in seguito usare la funzione esiste_gia_1Dgià
                 duale.Cell1DsExtrema.col(count) << i, j;
                 count++;
             }
@@ -1005,15 +1021,58 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	duale.NumCell2Ds=mesh.NumCell0Ds;
 	duale.Cell2DsVertices.resize(duale.NumCell2Ds);
     duale.Cell2DsId.resize(duale.NumCell2Ds);
+	duale.Cell2DsNumVert.reserve(duale.NumCell2Ds);
+	duale.Cell2DsNumEdg.reserve(duale.NumCell2Ds);
 	
-	//for (unsigned int v = 0; v < mesh.NumCell0Ds; v++) {
-	//	// facce che contengono il vertice v di mesh
-    //    vector<unsigned int> facce = facce_per_vertice[v];
-    //    vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
+	
+	for (unsigned int v = 0; v < mesh.NumCell0Ds; v++) {
+		// facce che contengono il vertice v di mesh
+        vector<unsigned int> facce = facce_per_vertice[v];
+        vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
 
-    //    duale.Cell2DsVertices[v] = facce_ordinate;
-    //    duale.Cell2DsId[v] = v;
-    //}
+        duale.Cell2DsVertices[v] = facce_ordinate;
+        duale.Cell2DsId[v] = v;
+		duale.Cell2DsNumVert.push_back(facce_ordinate.size());
+		duale.Cell2DsNumEdg.push_back(facce_ordinate.size());
+    }
+	
+	// ora ho i vertici che compongono ogni faccia, e tutti i lati del duale
+	// costruisco i lati che compongono ogni faccia cercando l'ordinamento
+	// per farlo uso un modo analogo a "tri_lati_facce" con la differenza che qui 
+	// tutti i lati sono già fatti
+		
+	duale.Cell2DsEdges.reserve(mesh.NumCell0Ds);
+	
+	for (unsigned int j=0;j<mesh.NumCell0Ds;j++){
+		vector<unsigned int> v={};
+		v.reserve(duale.Cell2DsNumEdg[j]);
+		for (unsigned int i=0;i<duale.Cell2DsNumEdg[j];i++){
+			unsigned int point_1 = duale.Cell2DsVertices[j][i];
+			unsigned int point_2 = duale.Cell2DsVertices[j][(i+1)%(duale.Cell2DsNumEdg[j])];
+			
+			//OSS: posso usare esiste già perchè ho creato i lati con id della coppia crescente
+			int id_l=esiste_gia_1D(point_1, point_2, duale);
+			if (id_l==-1){
+				// il lato è nuovo --> problema, li avevamo gia tutti
+				cerr<<"Errore grave, lato non esistente---------------------------------"<<endl;
+			} else{
+				// il lato esiste già 
+				v.push_back(id_l);
+			}
+			
+		}
+		duale.Cell2DsEdges.push_back(v);
+	}
+	
+	duale.Cell3DsId=0;
+	duale.Cell3DsNumVert =duale.NumCell0Ds;
+	duale.Cell3DsNumEdg =duale.NumCell1Ds;
+	duale.Cell3DsNumFaces =duale.NumCell2Ds;
+	
+	duale.Cell3DsVertices = duale.Cell0DsId;
+	duale.Cell3DsEdges = duale.Cell1DsId;
+	duale.Cell3DsFaces=duale.Cell2DsId; 
+	
 	
 	
 	
