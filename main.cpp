@@ -12,9 +12,9 @@ int main(){
 	
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
-	int p=4; // per ora non consideriamo altri casi se non 3
+	int p=3; 
 	int q=3;
-	int b=1; //e se b=0 o 1...vedere
+	int b=2; //e se b=0 o 1...vedere
 	int c=0;
 	unsigned int id1 = 0;
 	unsigned int id2 = 0;
@@ -82,6 +82,14 @@ int main(){
 		cout<<"in questo caso dobbiamo passare al duale"<<endl;
 		duale = CostruisciDualeMesh(mesh);
 		info_mesh(duale);
+		
+		if (!controllo_lati_vertici (duale)){
+		cerr<<"fallisce controllo su consecutività lati e vertici del DUALE"<<endl;
+		return 1;
+		}	
+		
+		
+		
 		Gedim::UCDUtilities utilities;
     {   
         utilities.ExportPoints("./Cell0Ds_duale.inp",
@@ -147,31 +155,5 @@ int main(){
 	
 	
 	
-	
-	
-	
-	
-	//////////////////////////////////////////////////////////
-	// stampe prova triangolazione
-	//mesh.Cell2DsVertices[0][0]
-	/*
-	Eigen::VectorXd col = mesh.Cell0DsCoordinates.col(2); // È un VectorXd con 3 elementi
-
-    // verifico che la colonna abbia esattamente 3 righe
-    if (col.size() != 3) {
-        std::cerr << "Errore: la colonna non ha 3 elementi.\n";
-        return 1;
-    }
-
-    std::array<double, 3> arr;
-    for (int i = 0; i < 3; ++i) {
-        arr[i] = col(i);
-    }
-	
-		
-	cout<<ArrayToString(3,&arr[0])<<endl;
-	
-	Eigen::VectorXd aaa=crea_vertice(1, 2, 1, 1, 3, mesh);
-	*/
 	return 0;
 }
