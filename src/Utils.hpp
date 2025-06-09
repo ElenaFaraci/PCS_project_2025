@@ -58,5 +58,7 @@ void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename)
 
 void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename);
 
+void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2);
+
 }
 

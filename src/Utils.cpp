@@ -1021,6 +1021,60 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	
 }
 
+void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
+    int n = mesh.Cell0DsCoordinates.cols();
+	if (id1 < 0 || id1 >= n || id2 < 0 || id2 >= n) {
+        cout << "Valore di id1 o id2 non valido" << endl;
+        return;
+    }
+    vector<Eigen::Vector3d> coords(n);
+    for (int i = 0; i < n; i++)
+        coords[i] = mesh.Cell0DsCoordinates.col(i);
+
+    Grafo grafo = costruisci_grafo_pesato(n, mesh.Cell1DsExtrema, coords);
+
+    vector<double> dist;
+    vector<int> pred;
+    vector<int> cammino = dijkstra(grafo, id1, id2, dist, pred);
+
+    mesh.Cell0DsShortPath.assign(n, 0);
+    mesh.Cell1DsShortPath.assign(mesh.Cell1DsExtrema.cols(), 0);
+
+    if (cammino.empty()) {
+        cout << "Nessun cammino trovato tra " << id1 << " e " << id2 << endl;
+        return;
+    }
+
+    for (int v : cammino) {
+        mesh.Cell0DsShortPath[v] = 1;
+    }
+
+    int num_archi = 0;
+    double lunghezza_totale = 0.0;
+	
+	for (size_t i = 0; i + 1 < cammino.size();i++) {
+		int u = cammino[i];
+		int v = cammino[i + 1];
+
+		for (size_t j = 0; j < mesh.Cell1DsExtrema.cols();j++) {
+			int a = mesh.Cell1DsExtrema(0, j);
+			int b = mesh.Cell1DsExtrema(1, j);
+			if ((a == u && b == v) || (a == v && b == u)) {
+				mesh.Cell1DsShortPath[j] = 1;
+				double lung = distanza(mesh.Cell0DsCoordinates.col(a), mesh.Cell0DsCoordinates.col(b));
+				lunghezza_totale += lung;
+				num_archi++;
+				break;
+		}
+	}
+}
+
+    cout << "Cammino minimo tra " << id1 << " e " << id2 << " trovato" << endl;
+    cout << "Numero di lati nel cammino: " << num_archi << endl;
+    cout << "Somma lunghezze: " << lunghezza_totale << endl;
+}
+
+
 
 	
 
