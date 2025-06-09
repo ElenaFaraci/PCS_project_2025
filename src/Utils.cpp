@@ -1120,8 +1120,7 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
 			int b = mesh.Cell1DsExtrema(1, j);
 			if ((a == u && b == v) || (a == v && b == u)) {
 				mesh.Cell1DsShortPath[j] = 1;
-				double lung = distanza(mesh.Cell0DsCoordinates.col(a), mesh.Cell0DsCoordinates.col(b));
-				lunghezza_totale += lung;
+				lunghezza_totale += distanza(mesh.Cell0DsCoordinates.col(a), mesh.Cell0DsCoordinates.col(b));
 				num_archi++;
 				break;
 		}

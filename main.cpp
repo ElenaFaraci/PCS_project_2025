@@ -87,8 +87,8 @@ int main(){
 		cerr<<"fallisce controllo su consecutività lati e vertici del DUALE"<<endl;
 		return 1;
 		}	
-		
-		
+		proiezione_su_sfera_unitaria(duale);
+		// qui cammino min
 		
 		Gedim::UCDUtilities utilities;
     {   
@@ -103,6 +103,11 @@ int main(){
                                  {});
     }
 	}
+	else {
+		proiezione_su_sfera_unitaria(mesh);
+		// qui cammino min
+	}
+	
 	
 	
 	
