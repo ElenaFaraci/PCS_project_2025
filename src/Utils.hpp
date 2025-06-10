@@ -26,7 +26,7 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b
 /// tri_vertici_facce e tri_lati_facce
 bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigned int q);
 
-Eigen::Vector3d baricentro(const std::vector<size_t>& vertici, const Eigen::MatrixXd& coords);
+Eigen::Vector3d baricentro(const std::vector<unsigned int>& vertici, const PolygonalMesh& mesh);
 
 PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh);
 
