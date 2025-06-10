@@ -58,6 +58,8 @@ void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename)
 
 void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename);
 
+double distanza(const Vector3d& p1, const Vector3d& p2);
+
 void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2);
 
 }

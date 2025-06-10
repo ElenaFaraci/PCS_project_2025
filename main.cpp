@@ -17,7 +17,7 @@ int main(){
 	int b=2; //e se b=0 o 1...vedere
 	int c=0;
 	unsigned int id1 = 0;
-	unsigned int id2 = 0;
+	unsigned int id2 = 2;
 	
 	// dobbiamo controllare l'input, positività, interi ecc...
 	
@@ -88,7 +88,7 @@ int main(){
 		return 1;
 		}	
 		proiezione_su_sfera_unitaria(duale);
-		// qui cammino min
+		trova_cammino_minimo(duale, id1, id2);
 		
 		Gedim::UCDUtilities utilities;
     {   
@@ -105,7 +105,7 @@ int main(){
 	}
 	else {
 		proiezione_su_sfera_unitaria(mesh);
-		// qui cammino min
+		trova_cammino_minimo(mesh, id1, id2);
 	}
 	
 	

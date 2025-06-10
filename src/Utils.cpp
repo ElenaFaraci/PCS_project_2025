@@ -5,6 +5,7 @@
 #include <cmath>
 #include "Eigen/Eigen"
 #include <numeric>
+#include <queue>
 #include <unordered_set>
 
 /*
@@ -1080,6 +1081,84 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	
 }
 
+using Grafo = std::vector<std::vector<std::pair<int, double>>>;
+
+double distanza(const Vector3d& p1, const Vector3d& p2) {
+    return (p1 - p2).norm();
+}
+
+Grafo costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, const std::vector<Eigen::Vector3d>& coords) {
+    Grafo grafo(n); 
+
+    for (int i = 0; i < Cell1DsExtrema.cols(); i++) {
+        int u = Cell1DsExtrema(0, i);
+        int v = Cell1DsExtrema(1, i);
+
+        double peso = (coords[u] - coords[v]).norm();
+
+        grafo[u].push_back({v, peso});
+        grafo[v].push_back({u, peso});
+    }
+
+    return grafo;
+}
+
+std::vector<int> dijkstra(
+    const Grafo& la,       
+    int s,                 
+    int w,                
+    std::vector<double>& dist,
+    std::vector<int>& pred
+) {
+    int n = static_cast<int>(la.size());
+    pred.resize(n);
+    dist.resize(n);
+
+    for (int i = 0; i < n; i++) {
+        pred[i] = -1;
+        dist[i] = std::numeric_limits<double>::infinity();
+    }
+    pred[s] = s;
+    dist[s] = 0;
+
+    using Nodo = std::pair<double, int>;
+    std::priority_queue<Nodo, std::vector<Nodo>, std::greater<Nodo>> PQ;
+
+    for (int i = 0; i < n; i++) {
+        PQ.push({dist[i], i});
+    }
+
+    std::vector<bool> visitato(n, false);
+
+    while (!PQ.empty()) {
+        auto [d, u] = PQ.top();
+        PQ.pop();
+
+        if (visitato[u]) continue; 
+        visitato[u] = true;
+
+        if (u == w) break; 
+
+        for (const auto& [vicino, peso] : la[u]) {
+            if (dist[vicino] > dist[u] + peso) {
+                dist[vicino] = dist[u] + peso;
+                pred[vicino] = u;
+                PQ.push({dist[vicino], vicino});
+            }
+        }
+    }
+	
+    std::vector<int> cammino;
+    if (dist[w] < std::numeric_limits<double>::infinity()) {
+        for (int cur = w; cur != s; cur = pred[cur]) {
+            cammino.push_back(cur);
+        }
+        cammino.push_back(s);
+        std::reverse(cammino.begin(), cammino.end());
+    }
+    return cammino;
+}
+
 void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
     int n = mesh.Cell0DsCoordinates.cols();
 	if (id1 < 0 || id1 >= n || id2 < 0 || id2 >= n) {
@@ -1095,9 +1174,9 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
     vector<double> dist;
     vector<int> pred;
     vector<int> cammino = dijkstra(grafo, id1, id2, dist, pred);
-
-    mesh.Cell0DsShortPath.assign(n, 0);
-    mesh.Cell1DsShortPath.assign(mesh.Cell1DsExtrema.cols(), 0);
+	
+	std::vector<int> Cell0DsShortPath(n, 0);
+    std::vector<int> Cell1DsShortPath(mesh.Cell1DsExtrema.cols(), 0);
 
     if (cammino.empty()) {
         cout << "Nessun cammino trovato tra " << id1 << " e " << id2 << endl;
@@ -1105,21 +1184,21 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
     }
 
     for (int v : cammino) {
-        mesh.Cell0DsShortPath[v] = 1;
+        Cell0DsShortPath[v] = 1;
     }
 
     int num_archi = 0;
     double lunghezza_totale = 0.0;
 	
-	for (size_t i = 0; i + 1 < cammino.size();i++) {
+	for (Eigen::Index i = 0; i + 1 < cammino.size();i++) {
 		int u = cammino[i];
 		int v = cammino[i + 1];
 
-		for (size_t j = 0; j < mesh.Cell1DsExtrema.cols();j++) {
+		for (Eigen::Index j = 0; j < mesh.Cell1DsExtrema.cols();j++) {
 			int a = mesh.Cell1DsExtrema(0, j);
 			int b = mesh.Cell1DsExtrema(1, j);
 			if ((a == u && b == v) || (a == v && b == u)) {
-				mesh.Cell1DsShortPath[j] = 1;
+				Cell1DsShortPath[j] = 1;
 				lunghezza_totale += distanza(mesh.Cell0DsCoordinates.col(a), mesh.Cell0DsCoordinates.col(b));
 				num_archi++;
 				break;
