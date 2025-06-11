@@ -30,12 +30,3 @@ namespace PolygonalLibrary {
 }
 
 }
-/*
-Eigen::Vector3d baricentro(const vector<unsigned int>& vertici, const PolygonalMesh& mesh) {
-    Eigen::Vector3d b = Eigen::Vector3d::Zero();
-    for (unsigned int v : vertici) {
-        b += mesh.Cell0DsCoordinates.col(v);
-    }
-    return b / vertici.size();
-}
-*/

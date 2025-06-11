@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "test_baricentro.hpp"
+#include "test_esiste_gia_1D.hpp"
+
 
 
 int main(int argc, char *argv[])
