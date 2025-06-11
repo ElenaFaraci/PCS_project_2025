@@ -2,6 +2,9 @@
 
 #include "test_baricentro.hpp"
 #include "test_esiste_gia_1D.hpp"
+#include "test_Esiste_gia.hpp"
+
+
 
 
 
