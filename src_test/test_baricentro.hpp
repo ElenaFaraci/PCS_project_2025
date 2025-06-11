@@ -10,7 +10,7 @@ using namespace std;
 
 namespace PolygonalLibrary {
 	
-	TEST(TestPolygons, test_baricentro)
+	TEST(TestDuale, test_baricentro)
 {
     PolygonalMesh mesh;
 

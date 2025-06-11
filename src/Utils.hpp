@@ -62,5 +62,7 @@ double distanza(const Vector3d& p1, const Vector3d& p2);
 
 void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2);
 
+vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh);
+
 }
 

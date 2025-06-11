@@ -3,6 +3,8 @@
 #include "test_baricentro.hpp"
 #include "test_esiste_gia_1D.hpp"
 #include "test_Esiste_gia.hpp"
+#include "test_trova_facce_per_vertice.hpp"
+
 
 
 
