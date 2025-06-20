@@ -658,6 +658,78 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 	
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+bool triangolazione_2(PolygonalMesh& mesh, unsigned int b, unsigned int q){
+	
+	PolygonalMesh mesh_2;
+	
+	
+	unsigned int num_facc;
+	if (q==3){
+		num_facc=4;
+	} else if (q==4){
+		num_facc=8;
+	} else if (q==5){
+		num_facc=20;
+	}
+	
+	unsigned int numero_vert_su_lati = mesh.NumCell0Ds + mesh.NumCell1Ds*(2*b-1);
+	MatrixXd matr_vert_lati = Zero(3,numero_vert_su_lati);
+	unsigned int count=0;
+	for (unsigned int i=0;i<mesh.NumCell1Ds;i++){
+		unsigned int p_1=mesh.Cell1DsExtrema(i,0);
+		unsigned int p_2=mesh.Cell1DsExtrema(i,1);
+		//matr_vert_lati.col(count++)=mesh.Cell0DsCoordinates.col(p_1);
+		for (unsigned int k=0; k<2*b+1;k++){
+			Vector3d nuovo_vert=Nuovo_Vertice(p_1, p_2, 2*b,k);
+			matr_vert_lati.col(count++)=nuovo_vert;
+		}
+		//matr_vert_lati.col(count++)=mesh.Cell0DsCoordinates.col(p_2);		
+	}
+	
+	bool stato = Triangolazione(mesh, b, b, q);
+	if(!stato){
+		cout<<"errore chiamata triangolazione in triangolazione_2"<<endl;
+	}
+	
+	MatrixXd matr_bar_facce = Zero(3,mesh.NumCell2Ds);
+	for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
+        Vector3d nuovo_bar= baricentro(mesh.Cell2DsVertices[i], mesh);
+		matr_bar_facce.col(i)=nuovo_bar;
+		
+    } 
+	
+	unsigned int v_count=0;
+	for (unsigned int i=0;i<num_facc;i++){
+		for (unsigned int k=0;k<b*b;k++){
+			unsigned int v_1= mesh.Cell2DsVertices[num_facc*b*b+k][0];
+			unsigned int v_2= mesh.Cell2DsVertices[num_facc*b*b+k][1];
+			unsigned int v_3= mesh.Cell2DsVertices[num_facc*b*b+k][2];
+			
+			mesh_2.Cell0DsCoordinates.col(v_count++)=mesh.Cell0DsCoordinates.col(v_1);
+			mesh_2.Cell0DsCoordinates.col(v_count++)=mesh.Cell0DsCoordinates.col(v_2);
+			mesh_2.Cell0DsCoordinates.col(v_count++)=mesh.Cell0DsCoordinates.col(v_3);
+			
+			for(unsigned int j=0;j<numero_vert_su_lati;j++){
+				
+			}
+			Vector3d m_1=Nuovo_Vertice(v_1, v_2, 2, 1);
+			Vector3d m_2=Nuovo_Vertice(v_1, v_3, 2, 1);
+			Vector3d m_3=Nuovo_Vertice(v_2, v_3, 2, 1);
+			
+			
+			
+		}
+		
+		
+	}
+}
+
+
+
+
+
+
 
 //Proiezione su sfera unitaria e controllo 
 void proiezione_su_sfera_unitaria(PolygonalMesh& mesh) {
