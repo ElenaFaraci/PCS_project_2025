@@ -7,7 +7,21 @@
 #include "test_tri_lati_facce.hpp"
 
 
+/*TO DO: 
+salvataggi celle 0D, 1D, 2D, 3D - enri
+distanza - enri
+proiezione sfera unitaria - enri
+trova cammino minimo - enri
+valorizza poliedro - enri
+contollo lati vertici
+nuovo vertice - fede
+dijkstra - enri
+grafo pesato- enri
+triangolazione - fede
+costruisci duale - fede
+tri_vertici_facce - fede
 
+*/
 
 
 
