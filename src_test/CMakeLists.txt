@@ -4,6 +4,7 @@ list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_Esiste_gia.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_trova_facce_per_vertice.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_tri_lati_facce.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_Nuovo_Vertice.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_tri_vertici_facce.hpp)
 
 
 

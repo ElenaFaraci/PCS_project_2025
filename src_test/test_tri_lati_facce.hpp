@@ -43,7 +43,7 @@ namespace PolygonalLibrary {
 	
 	tri_lati_facce(mesh, 1, 4);
 	
-	info_mesh(mesh);
+	//info_mesh(mesh);
 
 	
 	

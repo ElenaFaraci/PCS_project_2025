@@ -659,7 +659,7 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 bool triangolazione_2(PolygonalMesh& mesh, unsigned int b, unsigned int q){
 	
 	PolygonalMesh mesh_2;
@@ -726,7 +726,7 @@ bool triangolazione_2(PolygonalMesh& mesh, unsigned int b, unsigned int q){
 	}
 }
 
-
+*/
 
 
 
