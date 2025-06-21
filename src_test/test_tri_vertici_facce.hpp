@@ -167,10 +167,11 @@ namespace PolygonalLibrary {
 
     // test: mesh.Cell3DsFaces contiene tutti gli ID
     ASSERT_EQ(mesh.Cell3DsFaces.size(), mesh.NumCell2Ds);
-    
+    ASSERT_EQ(mesh.Cell3DsNumFaces, mesh.NumCell2Ds);
+
 	// test: le facce create sono quelle che mi aspetto, sulla base del vettore punti_faccia
-	
-	for (unsigned int f = 0; f < num_facc_pre; ++f) {
+	unsigned int count=0;
+	for (unsigned int f = 0; f < num_facc_pre; f++) {
         unsigned int offset = f * num_nuovi_per_faccia;
 
         
@@ -185,13 +186,13 @@ namespace PolygonalLibrary {
             {v0, v1, v3},
             {v1, v4, v3},
             {v1, v2, v4},
-            {v3, v5, v4}
+            {v3, v4, v5}
         };
 		
-		 ASSERT_EQ(mesh.Cell2DsVertices[offset], expected_faces[0]);
-		 ASSERT_EQ(mesh.Cell2DsVertices[offset + 1], expected_faces[1]);
-		 ASSERT_EQ(mesh.Cell2DsVertices[offset + 2], expected_faces[2]);
-		 ASSERT_EQ(mesh.Cell2DsVertices[offset + 3], expected_faces[3]);
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[0]);
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[1]);
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[2]);
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[3]);
 		 
 	
 	}
