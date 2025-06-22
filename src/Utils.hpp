@@ -64,5 +64,7 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2);
 
 vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh);
 
+void costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, const std::vector<Eigen::Vector3d>& coords) 
+
 }
 

@@ -5,11 +5,12 @@
 #include "test_Esiste_gia.hpp"
 #include "test_trova_facce_per_vertice.hpp"
 #include "test_tri_lati_facce.hpp"
+#include "test_trova_cammino.hpp"
+#include "test_proiezione_sfera.hpp"
 
 
 /*TO DO: 
 salvataggi celle 0D, 1D, 2D, 3D - enri
-distanza - enri
 proiezione sfera unitaria - enri
 trova cammino minimo - enri
 valorizza poliedro - enri
