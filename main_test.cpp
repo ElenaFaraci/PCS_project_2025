@@ -4,10 +4,9 @@
 #include "test_esiste_gia_1D.hpp"
 #include "test_Esiste_gia.hpp"
 #include "test_trova_facce_per_vertice.hpp"
-#include "test_tri_lati_facce.hpp"
 #include "test_Nuovo_Vertice.hpp"
 #include "test_tri_vertici_facce.hpp"
-
+#include "test_tri_lati_facce.hpp"
 
 
 

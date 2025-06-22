@@ -13,7 +13,10 @@ namespace PolygonalLibrary {
 	
 	TEST(TestTriangolazione, test_tri_lati_facce)
 {
-    PolygonalMesh mesh;
+    // dati i vertici delle facce, la funzione in questione carica sulla mesh:
+	// - i lati (Cell1DsExtrema)
+	// - i lati che compongono le facce (Cell2DsEdges)
+	PolygonalMesh mesh;
 	
 	unsigned int q = 3;
 	unsigned int b = 2;
@@ -146,7 +149,40 @@ namespace PolygonalLibrary {
 	
 	tri_lati_facce(mesh, b, num_facc_pre);
 	
+	// test: il numero di facce è coerente
+	ASSERT_EQ(mesh.Cell2DsEdges.size(), mesh.Cell2DsVertices.size() );
 	
+	// test: ogni faccia deve avere 3 lati
+    for (unsigned int i=0;i<mesh.Cell2DsEdges.size();i++) {
+        ASSERT_EQ(mesh.Cell2DsEdges[i].size(), 3);
+    }
+	
+	// test: usando la formula "num_lati=num_facc_pre*3*b*(b+1)/2 -b*mesh.NumCell1Ds"
+	unsigned int num_lati = 24;
+	ASSERT_EQ(mesh.Cell1DsId.size(), num_lati);
+	ASSERT_EQ(mesh.Cell3DsEdges.size(), num_lati);
+	
+	
+	// test: gli id lati sono consecutivi
+    for (unsigned int i=0;i<num_lati;i++) {
+        ASSERT_EQ(mesh.Cell1DsId[i], i);
+    }
+	
+	
+	// test: mi aspetto che per ogni faccia i lati facciano riferimento ai vertici opportuni
+	for (unsigned int i=0;i<mesh.Cell2DsVertices.size();i++){
+		vector<unsigned int> vertici = mesh.Cell2DsVertices[i];
+        vector<unsigned int> edges = mesh.Cell2DsEdges[i];
+        ASSERT_EQ(vertici.size(), 3);
+		for (unsigned int j=0;j<mesh.Cell2DsVertices[i].size();j++){
+			unsigned int id_lato = edges[j];
+			unsigned int a = mesh.Cell1DsExtrema(0, id_lato);
+            unsigned int b = mesh.Cell1DsExtrema(1, id_lato);
+			bool a_in = (a == vertici[0] || a == vertici[1] || a == vertici[2]);
+            bool b_in = (b == vertici[0] || b == vertici[1] || b == vertici[2]);
+            ASSERT_TRUE(a_in && b_in);
+		}
+	}
 	
 	
 	
