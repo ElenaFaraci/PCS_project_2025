@@ -615,6 +615,9 @@ int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh) {
 void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre){
 	
 	unsigned int num_lati=num_facc_pre*3*b*(b+1)/2 -b*mesh.NumCell1Ds; 
+	// siginificato del conto sopra: b*(b+1)/2 = b + (b-1) + (b-2) + ... che è il numero di lati creati salendo 
+	// di piano in piano, moltiplico per 3: i tre lati del triangolo originale sono le direzioni dei piani
+	// moltiplico per num_facc_pre. tolgo i lati creati sugli spiagoli del solido originale, che ho contato 2 vote
 	
 	mesh.Cell2DsEdges = {};
 	mesh.Cell2DsEdges.reserve(mesh.Cell2DsVertices.size());
@@ -659,6 +662,7 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
+/*
 bool triangolazione_2(PolygonalMesh& mesh, unsigned int b, unsigned int q){
 	
 	PolygonalMesh mesh_2;
@@ -725,7 +729,7 @@ bool triangolazione_2(PolygonalMesh& mesh, unsigned int b, unsigned int q){
 	}
 }
 
-
+*/
 
 
 

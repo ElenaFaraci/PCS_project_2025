@@ -11,11 +11,12 @@ using namespace std;
 
 namespace PolygonalLibrary {
 	
-	TEST(TestTriangolazione, test_tri_lati_facce)
+	TEST(TestTriangolazione, test_tri_vertici_facce)
 {
-    // dati i vertici delle facce, la funzione in questione carica sulla mesh:
-	// - i lati (Cell1DsExtrema)
-	// - i lati che compongono le facce (Cell2DsEdges)
+    // adotto la seguente strategia: siccome questa funzione viene chiamata dalla funzione 
+	// triangolazione, ricopio la funzione triangolazione qui sotto, fino a prima della chiamata
+	// della funzione del test in oggetto. Quindi faccio il vero e proprio test
+	
 	PolygonalMesh mesh;
 	
 	unsigned int q = 3;
@@ -142,50 +143,59 @@ namespace PolygonalLibrary {
 	mesh.Cell3DsVertices.resize(k);
 	iota(mesh.Cell3DsVertices.begin(), mesh.Cell3DsVertices.end(), 0);
 	
-	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
-	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// mi fermo qui con la copia della funzione
 	
-	tri_lati_facce(mesh, b, num_facc_pre);
+	//info_mesh(mesh);
 	
-	// test: il numero di facce è coerente
-	ASSERT_EQ(mesh.Cell2DsEdges.size(), mesh.Cell2DsVertices.size() );
-	
-	// test: ogni faccia deve avere 3 lati
-    for (unsigned int i=0;i<mesh.Cell2DsEdges.size();i++) {
-        ASSERT_EQ(mesh.Cell2DsEdges[i].size(), 3);
-    }
-	
-	// test: usando la formula "num_lati=num_facc_pre*3*b*(b+1)/2 -b*mesh.NumCell1Ds"
-	unsigned int num_lati = 24;
-	ASSERT_EQ(mesh.Cell1DsId.size(), num_lati);
-	ASSERT_EQ(mesh.Cell3DsEdges.size(), num_lati);
-	
-	
-	// test: gli id lati sono consecutivi
-    for (unsigned int i=0;i<num_lati;i++) {
-        ASSERT_EQ(mesh.Cell1DsId[i], i);
-    }
-	
-	
-	// test: mi aspetto che per ogni faccia i lati facciano riferimento ai vertici opportuni
-	for (unsigned int i=0;i<mesh.Cell2DsVertices.size();i++){
-		vector<unsigned int> vertici = mesh.Cell2DsVertices[i];
-        vector<unsigned int> edges = mesh.Cell2DsEdges[i];
-        ASSERT_EQ(vertici.size(), 3);
-		for (unsigned int j=0;j<mesh.Cell2DsVertices[i].size();j++){
-			unsigned int id_lato = edges[j];
-			unsigned int a = mesh.Cell1DsExtrema(0, id_lato);
-            unsigned int b = mesh.Cell1DsExtrema(1, id_lato);
-			bool a_in = (a == vertici[0] || a == vertici[1] || a == vertici[2]);
-            bool b_in = (b == vertici[0] || b == vertici[1] || b == vertici[2]);
-            ASSERT_TRUE(a_in && b_in);
-		}
-	}
+	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
 	
 	
 	
-}
+	// test: il numero di nuove facce è uguale a quello vecchio per b^2
+    ASSERT_EQ(mesh.NumCell2Ds, num_facc_pre * b * b);
 
+    // test: ogni faccia ha 3 vertici
+    for (int i=0;i<mesh.Cell2DsVertices.size();i++) {
+        ASSERT_EQ(mesh.Cell2DsVertices[i].size(), 3);
+    }
+
+    // test: ho costruito bene il vettore degli id
+    for (unsigned int i = 0; i < mesh.Cell2DsId.size(); i++) {
+        ASSERT_EQ(mesh.Cell2DsId[i], i);
+    }
+
+    // test: mesh.Cell3DsFaces contiene tutti gli ID
+    ASSERT_EQ(mesh.Cell3DsFaces.size(), mesh.NumCell2Ds);
+    ASSERT_EQ(mesh.Cell3DsNumFaces, mesh.NumCell2Ds);
+
+	// test: le facce create sono quelle che mi aspetto, sulla base del vettore punti_faccia
+	unsigned int count=0;
+	for (unsigned int f = 0; f < num_facc_pre; f++) {
+        unsigned int offset = f * num_nuovi_per_faccia;
+
+        
+        unsigned int v0 = punti_faccia[offset + 0];
+        unsigned int v1 = punti_faccia[offset + 1];
+        unsigned int v2 = punti_faccia[offset + 2];
+        unsigned int v3 = punti_faccia[offset + 3];
+        unsigned int v4 = punti_faccia[offset + 4];
+        unsigned int v5 = punti_faccia[offset + 5];
+
+        vector<vector<unsigned int>> expected_faces = {
+            {v0, v1, v3},
+            {v1, v4, v3},
+            {v1, v2, v4},
+            {v3, v4, v5}
+        };
+		
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[0]);
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[1]);
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[2]);
+		 ASSERT_EQ(mesh.Cell2DsVertices[count++], expected_faces[3]);
+		 
+	
+	}
+
+}
 }
