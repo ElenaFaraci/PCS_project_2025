@@ -519,6 +519,7 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 	tri_lati_facce(mesh, b, num_facc_pre);
 	
 	// --> TODO alla fine aggiorno il num facce tutto della mesh
+	return true;
 }
 
 void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,

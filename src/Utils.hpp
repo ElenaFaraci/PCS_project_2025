@@ -64,5 +64,7 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2);
 
 vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh);
 
+vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
+										  const vector<unsigned int>& facce_vicinato_v);
 }
 

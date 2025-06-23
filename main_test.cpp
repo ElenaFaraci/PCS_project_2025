@@ -5,8 +5,11 @@
 #include "test_Esiste_gia.hpp"
 #include "test_trova_facce_per_vertice.hpp"
 #include "test_Nuovo_Vertice.hpp"
+#include "test_Triangolazione.hpp"
 #include "test_tri_vertici_facce.hpp"
 #include "test_tri_lati_facce.hpp"
+#include "test_giro_attorno_vertice.hpp"
+#include "test_CostruisciDualeMesh.hpp"
 
 
 
