@@ -20,6 +20,11 @@ namespace PolygonalLibrary {
 	//duale.NumCell1Ds
 	//duale.Cell1DsId
 	
+	// Approccio: costruisco il duale aspettato del tetraedro e verifico che sia 
+	// ciò che mi aspetto
+	
+	
+	
 }
 
 }
