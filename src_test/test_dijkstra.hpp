@@ -9,7 +9,7 @@ using namespace std;
 
 namespace PolygonalLibrary {
 
-TEST(TestDijkstra, CamminoMinimoSemplice) {
+TEST(TestCammino, CamminoMinimoSemplice) {
     Grafo grafo(3);
     grafo[0].push_back({1, 1.0});
     grafo[1].push_back({0, 1.0});

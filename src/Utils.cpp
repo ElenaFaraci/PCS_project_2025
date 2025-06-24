@@ -1,4 +1,5 @@
 #include "Utils.hpp"
+#include "PolygonalMesh.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -1248,8 +1249,8 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
     vector<int> pred;
     vector<int> cammino = dijkstra(grafo, id1, id2, dist, pred);
 	
-	std::vector<int> Cell0DsShortPath(n, 0);
-    std::vector<int> Cell1DsShortPath(mesh.Cell1DsExtrema.cols(), 0);
+	mesh.Cell0DsShortPath.resize(n, 0);
+	mesh.Cell1DsShortPath.resize(mesh.Cell1DsExtrema.cols(), 0);
 
     if (cammino.empty()) {
         cout << "Nessun cammino trovato tra " << id1 << " e " << id2 << endl;
@@ -1257,7 +1258,7 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
     }
 
     for (int v : cammino) {
-        Cell0DsShortPath[v] = 1;
+        mesh.Cell0DsShortPath[v] = 1;
     }
 
     int num_archi = 0;
@@ -1271,7 +1272,7 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
 			int a = mesh.Cell1DsExtrema(0, j);
 			int b = mesh.Cell1DsExtrema(1, j);
 			if ((a == u && b == v) || (a == v && b == u)) {
-				Cell1DsShortPath[j] = 1;
+				mesh.Cell1DsShortPath[j] = 1;
 				lunghezza_totale += distanza(mesh.Cell0DsCoordinates.col(a), mesh.Cell0DsCoordinates.col(b));
 				num_archi++;
 				break;

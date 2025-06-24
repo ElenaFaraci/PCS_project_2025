@@ -12,7 +12,12 @@
 #include "test_CostruisciDualeMesh.hpp"
 #include "test_trova_cammino.hpp"
 #include "test_proiezione_sfera.hpp"
-
+#include "test_costruisci_grafo.hpp"
+#include "test_dijkstra.hpp"
+#include "test_salvataggio_Cell0D.hpp"
+#include "test_salvataggio_Cell1D.hpp"
+#include "test_salvataggio_Cell2D.hpp"
+#include "test_salvataggio_Cell3D.hpp"
 
 
 

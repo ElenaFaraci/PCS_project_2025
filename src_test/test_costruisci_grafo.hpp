@@ -9,7 +9,7 @@ using namespace std;
 
 namespace PolygonalLibrary{
 
-	TEST(TestGrafo, CostruisciGrafoPesato) {
+	TEST(TestCammino, CostruisciGrafoPesato) {
 		int n = 3;
 		Eigen::MatrixXi Cell1DsExtrema(2, 3);
 		Cell1DsExtrema << 0, 1, 2,

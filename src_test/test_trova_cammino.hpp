@@ -16,9 +16,7 @@ TEST(TestCammino, TestCamminoMinimoSimpleCase) {
 
 	mesh.Cell0DsCoordinates.col(4) << 10, 10, 10;  
 
-	bool cammino_trovato = trova_cammino_minimo(mesh, 0, 10, 0); 
-
-	ASSERT_TRUE(cammino_trovato);
+	trova_cammino_minimo(mesh, 0, 10); 
 	
 	vector<unsigned int> cammino_v_aspettato = {0, 2, 10};
     vector<unsigned int> cammino_v_ottenuto;

@@ -57,6 +57,9 @@ struct PolygonalMesh
 	vector<unsigned int> Cell3DsFaces = {};
 	
 	
+	std::vector<int> Cell0DsShortPath;
+    std::vector<int> Cell1DsShortPath;
+	
 };
 
 }
