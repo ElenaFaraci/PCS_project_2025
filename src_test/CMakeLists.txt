@@ -10,6 +10,7 @@ list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_giro_attorno_verti
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_CostruisciDualeMesh.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_proiezione_sfera.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_trova_cammino.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_controllo_lati_vertici.hpp)
 
 
 

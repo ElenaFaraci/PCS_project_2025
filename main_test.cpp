@@ -10,9 +10,9 @@
 #include "test_tri_lati_facce.hpp"
 #include "test_giro_attorno_vertice.hpp"
 #include "test_CostruisciDualeMesh.hpp"
-#include "test_trova_cammino.hpp"
-#include "test_proiezione_sfera.hpp"
-
+//#include "test_trova_cammino.hpp"
+//#include "test_proiezione_sfera.hpp"
+#include "test_controllo_lati_vertici.hpp"
 
 
 

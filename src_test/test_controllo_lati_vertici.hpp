@@ -10,11 +10,11 @@ using namespace std;
 
 namespace PolygonalLibrary {
 	
-	TEST(TestDuale, test_giro_attorno_vertice)
+	TEST(TestFunzionalità, test_controllo_lati_vertici)
 {
-	// l'idea è di costruirmi una mesh ad hoc, scelgo di testare su un "esagono"
-	// composto da 6 triangoli. (in generale la funzione può essere che non lavori sul 
-	// piano, ma qui non è rilevante.)
+	// sfrutto la mesh ad hoc, già costruita per il test "giro_attorno_vertice", 
+	// scelgo di testare su un "esagono"
+	// composto da 6 triangoli. 
 	
 	PolygonalMesh mesh;
 	
@@ -94,16 +94,47 @@ namespace PolygonalLibrary {
 	mesh.Cell3DsVertices = mesh.Cell0DsId; //costruttore di copia? 
 	mesh.Cell3DsEdges = mesh.Cell1DsId;
 	mesh.Cell3DsFaces = mesh.Cell2DsId;
-
-	vector<unsigned int> ordinamento_funz = giro_attorno_vertice(mesh, 0, {4,2,5,1,3,0});
-	// siccome la funzione ordina ciclicamente le facce partendo dalla prima mi posso aspettare:
-	vector<unsigned int> expected_1 = {4,5,0,1,2,3};
-	vector<unsigned int> expected_2 = {4,3,2,1,0,5};
-	// ed una delle due deve essere il risultato
-	//(in realtà so già che l'uguaglianza si ha con expected_1, perchè 
-	// nel vettore passato alla funzione, la faccia adiacente alla 4 e ad essa piu
-	// vicina è la 5)
+///////////////////////////////////////////////////////////////////////////////////
+	// siccome la mesh è costruita con i criteri di:
+	// - consecutività dei lati: due lati consecutivi in una faccia condividono un lato
+	// - ordine: il primo lato della faccia contiene il primo vertice
 	
-	EXPECT_TRUE(ordinamento_funz==expected_1 || ordinamento_funz==expected_2);
+	// mi aspetto che passi il controllo
+	EXPECT_TRUE(controllo_lati_vertici(mesh));
+	
+	
+	// faccio ora una modifica per cui la mesh ha ancora senso, ma non rispetta il vincolo
+	mesh.Cell2DsVertices={};
+	mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); 
+		
+	v0 = {0,1,2};
+	v1 = {0,2,3};
+	v2 = {0,3,4};
+	v3 = {0,4,5};
+	v4 = {0,5,6};
+	v5 = {0,6,1};
+		
+	mesh.Cell2DsVertices= {v0, v1, v2, v3, v4, v5};
+	
+	mesh.Cell2DsEdges={};
+	mesh.Cell2DsEdges.reserve(mesh.NumCell2Ds);
+		
+	// originale: vector<unsigned int> e0 = {11,0,6};
+	e0 = {0,6,11};
+	e1 = {6,1,7};
+	e2 = {7,2,8};
+	e3 = {8,3,9};
+	e4 = {9,4,10};
+	e5 = {10,5,11};
+		
+	mesh.Cell2DsEdges = {e0, e1, e2, e3, e4, e5};
+	
+	//ho mantenuto la consecutività, ma il lato e0 non contiene il primo vertice 
+	// della faccia 0 che è 0
+	//allora:
+	EXPECT_TRUE(!controllo_lati_vertici(mesh));
+	
+	
+	
 }
 }
