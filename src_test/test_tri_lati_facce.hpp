@@ -141,14 +141,15 @@ namespace PolygonalLibrary {
 	mesh.Cell3DsNumVert=k;
 	mesh.Cell3DsVertices.resize(k);
 	iota(mesh.Cell3DsVertices.begin(), mesh.Cell3DsVertices.end(), 0);
-	
+	//cout<<mesh.Cell1DsId.size()<<endl; -->6
 	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
-	
+	//cout<<mesh.Cell1DsId.size()<<endl; -->6
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// mi fermo qui con la copia della funzione
-	
+	//cout<<mesh.NumCell1Ds<<endl; -->6
 	tri_lati_facce(mesh, b, num_facc_pre);
-	
+	cout<<mesh.Cell1DsId.size()<<endl; //--> 2
+	//info_mesh(mesh);
 	// test: il numero di facce è coerente
 	ASSERT_EQ(mesh.Cell2DsEdges.size(), mesh.Cell2DsVertices.size() );
 	
@@ -158,13 +159,13 @@ namespace PolygonalLibrary {
     }
 	
 	// test: usando la formula "num_lati=num_facc_pre*3*b*(b+1)/2 -b*mesh.NumCell1Ds"
-	unsigned int num_lati = 24;
-	ASSERT_EQ(mesh.Cell1DsId.size(), num_lati);
-	ASSERT_EQ(mesh.Cell3DsEdges.size(), num_lati);
+	unsigned int num_lati_exp = 24;
+	ASSERT_EQ(mesh.Cell1DsId.size(), num_lati_exp);
+	ASSERT_EQ(mesh.Cell3DsEdges.size(), num_lati_exp);
 	
 	
 	// test: gli id lati sono consecutivi
-    for (unsigned int i=0;i<num_lati;i++) {
+    for (unsigned int i=0;i<num_lati_exp;i++) {
         ASSERT_EQ(mesh.Cell1DsId[i], i);
     }
 	

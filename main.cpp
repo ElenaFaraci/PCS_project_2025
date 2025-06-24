@@ -12,7 +12,7 @@ int main(){
 	
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
-	int p=4; 
+	int p=3; 
 	int q=3;
 	int b=2; //e se b=0 o 1...vedere
 	int c=0;
@@ -62,6 +62,7 @@ int main(){
 			bool f= Triangolazione(mesh, b, c, q);
 		}
 	} else{
+		
 		cout<<"indici di triangolazione non validi per ora..."<<endl;
 	}
 	
