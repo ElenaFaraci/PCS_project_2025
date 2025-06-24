@@ -1158,11 +1158,13 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	
 }
 
-using Grafo = std::vector<std::vector<std::pair<int, double>>>;
+
 
 double distanza(const Vector3d& p1, const Vector3d& p2) {
     return (p1 - p2).norm();
 }
+
+using Grafo = std::vector<std::vector<std::pair<int, double>>>;
 
 Grafo costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, const std::vector<Eigen::Vector3d>& coords) {
     Grafo grafo(n); 
