@@ -62,8 +62,7 @@ int main(){
 			bool f= Triangolazione(mesh, b, c, q);
 		}
 	} else{
-		
-		cout<<"indici di triangolazione non validi per ora..."<<endl;
+		bool f= triangolazione_2(mesh, b, q);
 	}
 	
 	
