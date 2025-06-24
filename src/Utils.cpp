@@ -1182,13 +1182,7 @@ Grafo costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, cons
     return grafo;
 }
 
-std::vector<int> dijkstra(
-    const Grafo& la,       
-    int s,                 
-    int w,                
-    std::vector<double>& dist,
-    std::vector<int>& pred
-) {
+std::vector<int> dijkstra(const Grafo& la, int s, int w, std::vector<double>& dist, std::vector<int>& pred) {
     int n = static_cast<int>(la.size());
     pred.resize(n);
     dist.resize(n);

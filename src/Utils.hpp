@@ -64,9 +64,12 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2);
 
 vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh);
 
-<<<<<<< HEAD
+std::vector<int> dijkstra(const Grafo& la, int s, int w, std::vector<double>& dist, std::vector<int>& pred);
+
 using Grafo = std::vector<std::vector<std::pair<int, double>>>;
 Grafo costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, const std::vector<Eigen::Vector3d>& coords);
+
+<<<<<<< HEAD
 =======
 vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
 										  const vector<unsigned int>& facce_vicinato_v);

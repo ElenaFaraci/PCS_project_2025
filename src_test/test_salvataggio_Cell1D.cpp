@@ -8,31 +8,34 @@
 
 using namespace std;
 
-TEST(TestPolygons, TestSalvataggioCell1Ds) {
-    PolygonalMesh mesh;
-    valorizza_poliedro(3, mesh);
+namespace PolygonalLibrary {
 
-    const std::string filename = "test_Cell1Ds.txt";
-    salvataggio_Cell1Ds(mesh, filename);
+	TEST(TestPolygons, TestSalvataggioCell1Ds) {
+		PolygonalMesh mesh;
+		valorizza_poliedro(3, mesh);
 
-    std::ifstream file(filename);
-    ASSERT_TRUE(file.is_open());
+		const string filename = "test_Cell1Ds.txt";
+		salvataggio_Cell1Ds(mesh, filename);
 
-    std::string line;
-    std::getline(file, line);
-    EXPECT_EQ(line, "-- Cell1D --");
+		ifstream file(filename);
+		ASSERT_TRUE(file.is_open());
 
-    std::getline(file, line);
-    std::getline(file, line);
-    EXPECT_EQ(line, "Numero di Cell1Ds: 6");
+		string line;
+		getline(file, line);
+		EXPECT_EQ(line, "-- Cell1D --");
 
-    std::getline(file, line);
-    std::getline(file, line);
-    EXPECT_EQ(line, "Identificativi: ");
+		getline(file, line);
+		getline(file, line);
+		EXPECT_EQ(line, "Numero di Cell1Ds: 6");
 
-    std::getline(file, line);
-    EXPECT_EQ(std::stoi(line), 0);
+		getline(file, line);
+		getline(file, line);
+		EXPECT_EQ(line, "Identificativi: ");
 
-    file.close();
-    std::remove(filename.c_str());
+		getline(file, line);
+		EXPECT_EQ(stoi(line), 0);
+
+		file.close();
+		remove(filename.c_str());
+	}
 }

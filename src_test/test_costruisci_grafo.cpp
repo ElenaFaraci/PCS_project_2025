@@ -14,7 +14,7 @@ namespace PolygonalLibrary{
 		Eigen::MatrixXi Cell1DsExtrema(2, 3);
 		Cell1DsExtrema << 0, 1, 2,
 						  1, 2, 0;
-		std::vector<Eigen::Vector3d> coords = {
+		vector<Eigen::Vector3d> coords = {
 			{0.0, 0.0, 0.0},
 			{1.0, 0.0, 0.0},
 			{0.0, 1.0, 0.0}

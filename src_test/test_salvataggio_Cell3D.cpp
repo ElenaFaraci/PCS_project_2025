@@ -8,28 +8,31 @@
 
 using namespace std;
 
-TEST(TestPolygons, TestSalvataggioCell3Ds) {
-    PolygonalMesh mesh;
-    valorizza_poliedro(3, mesh);
+namespace PolygonalLibrary {
 
-    const std::string filename = "test_Cell3Ds.txt";
-    salvataggio_Cell3Ds(mesh, filename);
+	TEST(TestPolygons, TestSalvataggioCell3Ds) {
+		PolygonalMesh mesh;
+		valorizza_poliedro(3, mesh);
 
-    std::ifstream file(filename);
-    ASSERT_TRUE(file.is_open());
+		const string filename = "test_Cell3Ds.txt";
+		salvataggio_Cell3Ds(mesh, filename);
 
-    std::string line;
-    std::getline(file, line);
-    EXPECT_EQ(line, "-- Cell3D --");
+		ifstream file(filename);
+		ASSERT_TRUE(file.is_open());
 
-    std::getline(file, line);
-    std::getline(file, line);
-    EXPECT_EQ(line, "Numero di Cell3Ds: 1");
+		string line;
+		getline(file, line);
+		EXPECT_EQ(line, "-- Cell3D --");
 
-    std::getline(file, line);
-    std::getline(file, line);
-    EXPECT_EQ(line, "Numero Vertici:  4");
+		getline(file, line);
+		getline(file, line);
+		EXPECT_EQ(line, "Numero di Cell3Ds: 1");
 
-    file.close();
-    std::remove(filename.c_str());
+		getline(file, line);
+		getline(file, line);
+		EXPECT_EQ(line, "Numero Vertici:  4");
+
+		file.close();
+		remove(filename.c_str());
+	}
 }

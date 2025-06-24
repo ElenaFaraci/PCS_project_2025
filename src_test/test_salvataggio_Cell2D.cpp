@@ -8,31 +8,33 @@
 
 using namespace std;
 
-TEST(TestPolygons, TestSalvataggioCell2Ds) {
-    PolygonalMesh mesh;
-    valorizza_poliedro(3, mesh);
+namespace PolygonalLibrary {
+	TEST(TestPolygons, TestSalvataggioCell2Ds) {
+		PolygonalMesh mesh;
+		valorizza_poliedro(3, mesh);
 
-    const std::string filename = "test_Cell2Ds.txt";
-    salvataggio_Cell2Ds(mesh, filename);
+		const string filename = "test_Cell2Ds.txt";
+		salvataggio_Cell2Ds(mesh, filename);
 
-    std::ifstream file(filename);
-    ASSERT_TRUE(file.is_open());
+		ifstream file(filename);
+		ASSERT_TRUE(file.is_open());
 
-    std::string line;
-    std::getline(file, line);
-    EXPECT_EQ(line, "-- Cell2D --");
+		string line;
+		getline(file, line);
+		EXPECT_EQ(line, "-- Cell2D --");
 
-    std::getline(file, line);
-    std::getline(file, line);
-    EXPECT_EQ(line, "Numero di Cell2Ds: 4");
+		getline(file, line);
+		getline(file, line);
+		EXPECT_EQ(line, "Numero di Cell2Ds: 4");
 
-    std::getline(file, line);
-    std::getline(file, line);
-    EXPECT_EQ(line, "Identificativi: ");
+		getline(file, line);
+		getline(file, line);
+		EXPECT_EQ(line, "Identificativi: ");
 
-    std::getline(file, line);
-    EXPECT_EQ(std::stoi(line), 0);
+		getline(file, line);
+		EXPECT_EQ(stoi(line), 0);
 
-    file.close();
-    std::remove(filename.c_str());
+		file.close();
+		remove(filename.c_str());
+	}
 }

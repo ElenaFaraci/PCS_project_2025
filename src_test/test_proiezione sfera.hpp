@@ -7,13 +7,15 @@
 #include "Utils.hpp"  
 
 using namespace std;
+using namespace Eigen;
+
 
 namespace PolygonalLibrary{
 	TEST(TestPolygons, TestProiezioneSfera){
 	PolygonalMesh mesh;
 	mesh.NumCell0Ds = 3;
     mesh.Cell0DsId = {0, 1, 2};
-    mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
+    mesh.Cell0DsCoordinates = MatrixXd::Zero(3, mesh.NumCell0Ds);
 	
 	mesh.Cell0DsCoordinates.col(0) << 5.0, 1.0, 0.0;
 	mesh.Cell0DsCoordinates.col(1) << -2.0, 4.0, 3.0;
@@ -32,13 +34,13 @@ namespace PolygonalLibrary{
 		
         mesh.NumCell0Ds = 1;
         mesh.Cell0DsId = {0};
-        mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
+        mesh.Cell0DsCoordinates = MatrixXd::Zero(3, mesh.NumCell0Ds);
 		mesh.Cell0DsCoordinates.col(0) << 1.0, 0.0, 0.0;
 		
-		Eigen::Vector3d originale = mesh.Cell0DsCoordinates.col(0).normalized();
+		Vector3d originale = mesh.Cell0DsCoordinates.col(0).normalized();
 		proiezione_su_sfera_unitaria(mesh);
 		
-		Eigen::Vector3d proiettato = mesh.Cell0DsCoordinates.col(0);
+		Vector3d proiettato = mesh.Cell0DsCoordinates.col(0);
 		
 		EXPECT_TRUE((originale - proiettato).norm() < 1e-10)
             << "La direzione del vertice è cambiata dopo la normalizzazione.";
@@ -48,16 +50,16 @@ namespace PolygonalLibrary{
 		
         mesh.NumCell0Ds = 1;
         mesh.Cell0DsId = {0};
-        mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
+        mesh.Cell0DsCoordinates = MatrixXd::Zero(3, mesh.NumCell0Ds);
 
         mesh.Cell0DsCoordinates.col(0) << 1.0, 0.0, 0.0;
 
 
-        Eigen::Vector3d prima = mesh.Cell0DsCoordinates.col(0);
+        Vector3d prima = mesh.Cell0DsCoordinates.col(0);
 
         proiezione_su_sfera_unitaria(mesh);
 		
-        Eigen::Vector3d dopo = mesh.Cell0DsCoordinates.col(0);
+        Vector3d dopo = mesh.Cell0DsCoordinates.col(0);
         EXPECT_TRUE((prima - dopo).norm() < 1e-10)
             << "Il punto già normalizzato è stato modificato dalla funzione.";
     }
