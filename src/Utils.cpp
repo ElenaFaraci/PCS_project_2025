@@ -664,74 +664,357 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-/*
-bool triangolazione_2(PolygonalMesh& mesh, unsigned int b, unsigned int q){
+///////////////////////////////////////////////////////////////////////////////////////////
+bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	
-	PolygonalMesh mesh_2;
-	
-	
+	unsigned int T = 3*b*b;
 	unsigned int num_facc;
+	unsigned int num_lati;
 	if (q==3){
 		num_facc=4;
+		num_lati = 6;
 	} else if (q==4){
 		num_facc=8;
+		num_lati = 12;
 	} else if (q==5){
 		num_facc=20;
+		num_lati = 30;
 	}
+
+	// Per effettuare la triangolazione di classe II, sfrutto il poliedro di partenza (3, q, 0, 0) e la sua triangolazione di classe I di parametri (3, q, b, 0). Ricavo tutti i vertici che otterrò (dalla triangolazione di classe II) sui lati del poliedro.
+	PolygonalMesh poliedro = mesh_2;
+	PolygonalMesh mesh = mesh_2;
 	
-	unsigned int numero_vert_su_lati = mesh.NumCell0Ds + mesh.NumCell1Ds*(2*b-1);
-	MatrixXd matr_vert_lati = Zero(3,numero_vert_su_lati);
-	unsigned int count=0;
-	for (unsigned int i=0;i<mesh.NumCell1Ds;i++){
-		unsigned int p_1=mesh.Cell1DsExtrema(i,0);
-		unsigned int p_2=mesh.Cell1DsExtrema(i,1);
-		//matr_vert_lati.col(count++)=mesh.Cell0DsCoordinates.col(p_1);
-		for (unsigned int k=0; k<2*b+1;k++){
-			Vector3d nuovo_vert=Nuovo_Vertice(p_1, p_2, 2*b,k);
-			matr_vert_lati.col(count++)=nuovo_vert;
-		}
-		//matr_vert_lati.col(count++)=mesh.Cell0DsCoordinates.col(p_2);		
-	}
-	
-	bool stato = Triangolazione(mesh, b, b, q);
-	if(!stato){
+	bool stato1 = Triangolazione(mesh, b, 0, q);
+	if(!stato1){
 		cout<<"errore chiamata triangolazione in triangolazione_2"<<endl;
 	}
-	
-	MatrixXd matr_bar_facce = Zero(3,mesh.NumCell2Ds);
-	for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
-        Vector3d nuovo_bar= baricentro(mesh.Cell2DsVertices[i], mesh);
-		matr_bar_facce.col(i)=nuovo_bar;
-		
-    } 
-	
-	unsigned int v_count=0;
-	for (unsigned int i=0;i<num_facc;i++){
-		for (unsigned int k=0;k<b*b;k++){
-			unsigned int v_1= mesh.Cell2DsVertices[num_facc*b*b+k][0];
-			unsigned int v_2= mesh.Cell2DsVertices[num_facc*b*b+k][1];
-			unsigned int v_3= mesh.Cell2DsVertices[num_facc*b*b+k][2];
-			
-			mesh_2.Cell0DsCoordinates.col(v_count++)=mesh.Cell0DsCoordinates.col(v_1);
-			mesh_2.Cell0DsCoordinates.col(v_count++)=mesh.Cell0DsCoordinates.col(v_2);
-			mesh_2.Cell0DsCoordinates.col(v_count++)=mesh.Cell0DsCoordinates.col(v_3);
-			
-			for(unsigned int j=0;j<numero_vert_su_lati;j++){
-				
-			}
-			Vector3d m_1=Nuovo_Vertice(v_1, v_2, 2, 1);
-			Vector3d m_2=Nuovo_Vertice(v_1, v_3, 2, 1);
-			Vector3d m_3=Nuovo_Vertice(v_2, v_3, 2, 1);
-			
-			
-			
+
+	unsigned int numero_vert_su_lati = poliedro.NumCell0Ds + poliedro.NumCell1Ds*(2*b-1);
+	MatrixXd matr_vert_lati = MatrixXd::Zero(3,numero_vert_su_lati);
+	unsigned int count=0;
+	for (unsigned int j = 0; j < poliedro.NumCell0Ds; j++){
+		Vector3d vertice = poliedro.Cell0DsCoordinates.col(j);
+		matr_vert_lati.col(count)=vertice;
+		count ++;
 		}
-		
-		
+	for (unsigned int i=0;i<poliedro.NumCell1Ds;i++){
+		unsigned int p_1=poliedro.Cell1DsExtrema(0,i);
+		unsigned int p_2=poliedro.Cell1DsExtrema(1,i);
+		for (unsigned int k=1; k<2*b;k++){
+			Vector3d nuovo_vert=Nuovo_Vertice(p_1, p_2, 2*b, k, poliedro);
+			matr_vert_lati.col(count)=nuovo_vert;
+			count ++;
+		}
 	}
+	// Inizializzo mesh_2, che conterrà la seconda triangolazione
+	// Cell0Ds
+
+	unsigned int num_vertices = mesh.NumCell0Ds + num_lati * b + mesh.NumCell2Ds;
+	mesh_2.NumCell0Ds = num_vertices;
+	
+	mesh_2.Cell0DsId = {};
+	mesh_2.Cell0DsId.reserve(num_vertices);
+	iota(mesh_2.Cell0DsId.begin(), mesh_2.Cell0DsId.end(), 0); // non funziona
+	
+	mesh_2.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh_2.NumCell0Ds);
+
+	// Cell1Ds
+	mesh_2.NumCell1Ds = num_lati*b*b+(6*b*b-(b-1)*b/2*3)*num_facc;
+	
+	mesh_2.Cell1DsId = {};
+	mesh_2.Cell1DsId.reserve(mesh_2.NumCell1Ds);
+	iota(mesh_2.Cell1DsId.begin(), mesh_2.Cell1DsId.end(), 0); // non funziona
+	
+	mesh_2.Cell1DsExtrema = Eigen::MatrixXi(2, mesh_2.NumCell1Ds);
+	
+	//Cell2Ds
+	unsigned int F = num_facc*6*(b*b+b)/2;
+	mesh_2.NumCell2Ds = F;
+	
+	mesh_2.Cell2DsId={};
+	mesh_2.Cell2DsId.reserve(F);
+	iota(mesh_2.Cell2DsId.begin(), mesh_2.Cell2DsId.end(), 0);
+
+	mesh_2.Cell2DsNumVert.assign(F,3);
+	mesh_2.Cell2DsNumEdg.assign(F,3);
+	
+	mesh_2.Cell2DsVertices={};
+	mesh_2.Cell2DsVertices.reserve(mesh.NumCell2Ds);
+	mesh_2.Cell2DsEdges={};
+	mesh_2.Cell2DsEdges.reserve(mesh.NumCell2Ds);
+	
+	// creo una matrice che abbia, come colonne, le componenti (x,y,z) dei baricentri delle facce di mesh, in modo che siano ordinati come le facce di mesh.
+
+	MatrixXd matr_bar_facce = MatrixXd::Zero(3,mesh.NumCell2Ds); 
+	for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
+		Vector3d nuovo_bar = baricentro(mesh.Cell2DsVertices[i], mesh);
+		matr_bar_facce.col(i)=nuovo_bar;
+	}
+
+	// Adesso itero sulle facce del poliedro, e per ogni faccia itero sui triangoli in mesh che fanno parte di questa, aggiungendo vertici, lati e facce a mesh_2.
+	info_mesh(mesh);
+	unsigned int v_count = 0;
+	unsigned int l_count = 0;
+	for (unsigned int i=0;i<num_facc;i++){ // itero sulle facce del poliedro
+		// creo delle strutture in cui salverò i vertici dei lati presenti in mesh che non sono parte di mesh_2, e il baricentro del triangolo di cui fanno parte
+		VectorXd baricentri_faccia_grande = VectorXd::Zero((b-1)*b*3);
+		MatrixXd estremi_lato_baricentro = MatrixXd::Zero(2, (b-1)*b*3);
+		unsigned int bar_count = 0;
+
+		for (unsigned int k=0;k<b*b;k++){
+			unsigned int v_1= mesh.Cell2DsVertices[i*b*b+k][0];
+			unsigned int v_2= mesh.Cell2DsVertices[i*b*b+k][1];
+			unsigned int v_3= mesh.Cell2DsVertices[i*b*b+k][2];
+			Vector3d coord_v1 = mesh.Cell0DsCoordinates.col(v_1);
+
+			int id_v1 = Esiste_gia(mesh_2, coord_v1, v_count);
+			if (id_v1 == -1){
+				id_v1 = v_count;
+				mesh_2.Cell0DsCoordinates.col(v_count) = coord_v1;
+				v_count ++;
+				}
+
+			Vector3d coord_v2 = mesh.Cell0DsCoordinates.col(v_2);
+
+			int id_v2 = Esiste_gia(mesh_2, coord_v2, v_count);
+			if (id_v2 == -1){
+				id_v2 = v_count;
+				mesh_2.Cell0DsCoordinates.col(v_count) = coord_v2;
+				v_count ++;
+				}
+				
+			Vector3d coord_v3 = mesh.Cell0DsCoordinates.col(v_3);
+
+			int id_v3 = Esiste_gia(mesh_2, coord_v3, v_count);
+			if (id_v3 == -1){
+				id_v3 = v_count;
+				mesh_2.Cell0DsCoordinates.col(v_count) = coord_v3;
+				v_count ++;
+				}
+
+			Vector3d m_1 = Nuovo_Vertice(id_v1, id_v2, 2, 1, mesh_2);
+			Vector3d m_2 = Nuovo_Vertice(id_v1, id_v3, 2, 1, mesh_2);
+			Vector3d m_3 = Nuovo_Vertice(id_v2, id_v3, 2, 1, mesh_2);
+			
+			Vector3d baricentro_corrente = matr_bar_facce.col(i*b*b+k); 
+			unsigned int id_bar_corrente = v_count;
+			mesh_2.Cell0DsCoordinates.col(v_count++)=baricentro_corrente;
+			int id_v1_b = esiste_gia_1D(id_v1, id_bar_corrente, mesh_2);
+			if (id_v1_b == -1){
+				id_v1_b = l_count;
+				mesh_2.Cell1DsExtrema.col(l_count) << id_v1, id_bar_corrente;
+				l_count ++;
+				}
+			int id_v2_b = esiste_gia_1D(id_v2, id_bar_corrente, mesh_2);
+			if (id_v2_b == -1){
+				id_v2_b = l_count;
+				mesh_2.Cell1DsExtrema.col(l_count) << id_v2, id_bar_corrente;
+				l_count ++;
+				}
+			int id_v3_b = esiste_gia_1D(id_v3, id_bar_corrente, mesh_2);
+			if (id_v3_b == -1){
+				id_v3_b = l_count;
+				mesh_2.Cell1DsExtrema.col(l_count) << id_v3, id_bar_corrente;
+				l_count ++;
+				}
+			bool check_m1 = false;
+			bool check_m2 = false;
+			bool check_m3 = false;
+
+			for(unsigned int j=0;j<numero_vert_su_lati;j++){ // indice sul vettore dei vertici: j
+				// controllo su m_1
+				if ((matr_vert_lati.col(j) - m_1).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
+					// salvare i vertici in mesh_2 e salvare i dati attraverso gli id
+					int id_m_1 = Esiste_gia(mesh_2, m_1, v_count);
+					if (id_m_1 == -1){
+						id_m_1 = v_count;
+						mesh_2.Cell0DsCoordinates.col(v_count) = m_1;
+						v_count ++;
+						}
+					
+					int l_m1_v1 = esiste_gia_1D(id_m_1, id_v1, mesh_2);
+					if (l_m1_v1 == -1){
+						l_m1_v1 = l_count;
+						mesh_2.Cell1DsExtrema.col(l_count) << id_m_1, id_v1;
+						l_count ++;
+						}
+						
+					int l_m1_v2 = esiste_gia_1D(id_m_1, id_v2, mesh_2);
+					if (l_m1_v2 == -1){
+						l_m1_v2 = l_count;
+						mesh_2.Cell1DsExtrema.col(l_count) << id_m_1, id_v2;
+						l_count ++;
+						}
+					
+					mesh_2.Cell1DsExtrema.col(l_count) << id_m_1, id_bar_corrente;
+
+					mesh_2.Cell2DsVertices.push_back({id_bar_corrente, id_v1, id_m_1});
+					mesh_2.Cell2DsVertices.push_back({id_m_1, id_v2, id_bar_corrente});
+					
+					mesh_2.Cell2DsEdges.push_back({id_v1_b, l_m1_v1, l_count});
+					mesh_2.Cell2DsEdges.push_back({l_m1_v2, id_v2_b, l_count});
+					
+					l_count ++;
+					check_m1 = true;
+					
+					}
+
+					
+				// controllo su m_2
+				if ((matr_vert_lati.col(j) - m_2).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
+					int id_m_2 = Esiste_gia(mesh_2, m_2, v_count);
+					if (id_m_2 == -1){
+						id_m_2 = v_count;
+						mesh_2.Cell0DsCoordinates.col(v_count) = m_2;
+						v_count ++;
+						}
+						
+					int l_m2_v1 = esiste_gia_1D(id_m_2, id_v1, mesh_2);
+					if (l_m2_v1 == -1){
+						l_m2_v1 = l_count;
+						mesh_2.Cell1DsExtrema.col(l_count) << id_m_2, id_v1;
+						l_count ++;
+						}
+						
+					int l_m2_v3 = esiste_gia_1D(id_m_2, id_v3, mesh_2);
+					if (l_m2_v3 == -1){
+						l_m2_v3 = l_count;
+						mesh_2.Cell1DsExtrema.col(l_count) << id_m_2, id_v3;
+						l_count ++;
+						}
+
+					mesh_2.Cell1DsExtrema.col(l_count) << id_m_2, id_bar_corrente;
+					
+					mesh_2.Cell2DsVertices.push_back({id_bar_corrente, id_v1, id_m_2});
+					mesh_2.Cell2DsVertices.push_back({id_m_2, id_v3, id_bar_corrente});
+					
+					mesh_2.Cell2DsEdges.push_back({id_v1_b, l_m2_v1, l_count});
+					mesh_2.Cell2DsEdges.push_back({l_m2_v3, id_v3_b, l_count});
+
+					l_count ++;
+					check_m2 = true;
+					
+					}
+
+				// controllo su m_3
+				if ((matr_vert_lati.col(j) - m_3).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
+					int id_m_3 = Esiste_gia(mesh_2, m_3, v_count);
+					if (id_m_3 == -1){
+						id_m_3 = v_count;
+						mesh_2.Cell0DsCoordinates.col(v_count) = m_3;
+						v_count ++;
+						}
+					
+					int l_m3_v3 = esiste_gia_1D(id_m_3, id_v3, mesh_2);
+					if (l_m3_v3 == -1){
+						l_m3_v3 = l_count;
+						mesh_2.Cell1DsExtrema.col(l_count) << id_m_3, id_v3;
+						l_count ++;
+						}
+						
+					int l_m3_v2 = esiste_gia_1D(id_m_3, id_v2, mesh_2);
+					if (l_m3_v2 == -1){
+						l_m3_v2 = l_count;
+						mesh_2.Cell1DsExtrema.col(l_count) << id_m_3, id_v2;
+						l_count ++;
+						}
+					
+					mesh_2.Cell1DsExtrema.col(l_count) << id_m_3, id_bar_corrente;
+					
+					mesh_2.Cell2DsVertices.push_back({id_bar_corrente, id_v3, id_m_3});
+					mesh_2.Cell2DsVertices.push_back({id_m_3, id_v2, id_bar_corrente});
+					
+					mesh_2.Cell2DsEdges.push_back({id_v3_b, l_m3_v3, l_count});
+					mesh_2.Cell2DsEdges.push_back({l_m3_v2, id_v2_b, l_count});
+
+					l_count ++;
+					check_m3 = true;
+
+					}
+			}
+
+			if (check_m1 == false){
+				baricentri_faccia_grande[bar_count] = id_bar_corrente;
+				estremi_lato_baricentro.col(bar_count) << id_v1, id_v2;
+				bar_count ++;
+				}
+			if (check_m2 == false){
+				baricentri_faccia_grande[bar_count] = id_bar_corrente;
+				estremi_lato_baricentro.col(bar_count) << id_v1, id_v3;
+				bar_count ++;
+				}
+			if (check_m3 == false){
+				baricentri_faccia_grande[bar_count] = id_bar_corrente;
+				estremi_lato_baricentro.col(bar_count) << id_v2, id_v3;
+				bar_count ++;
+				}
+		}
+		// adesso itero su baricentri_faccia_grande e estremi_lato_baricentro
+		VectorXd indici_visitati = VectorXd::Zero(b*(b-1)*3); 
+		for (unsigned int i_=0; i_<(b-1)*b*3-1; i_++){
+			
+			if (indici_visitati[i_]==0){
+				unsigned int bar_i = baricentri_faccia_grande[i_];
+				unsigned int v_1 = estremi_lato_baricentro(0, i_);
+				unsigned int v_2 = estremi_lato_baricentro(1, i_);
+				unsigned int v1_i = min(v_1, v_2);
+				unsigned int v2_i= max(v_1, v_2);
+				for (unsigned int j_=1; j_<(b-1)*b*3; j_++){
+					if (indici_visitati[j_]==0){
+						unsigned int bar_j = baricentri_faccia_grande[j_];
+						if (bar_j != bar_i){
+							unsigned int v_1_ = estremi_lato_baricentro(0, j_);
+							unsigned int v_2_ = estremi_lato_baricentro(1, j_);
+							unsigned int v1_j = min(v_1_, v_2_);
+							unsigned int v2_j = max(v_1_, v_2_);
+							if (v1_i == v1_j){
+								if (v2_i == v2_j){
+									indici_visitati[j_] = 1;
+									mesh_2.Cell1DsExtrema.col(l_count) << bar_i, bar_j; 
+									
+									// creo triangolo con v1 e i due baricentri, prima recupero gli id dei lati
+									int l_v1_bi = esiste_gia_1D(v1_i, bar_i, mesh_2);
+									int l_v1_bj = esiste_gia_1D(v1_i, bar_j, mesh_2);
+									if (l_v1_bi == -1){
+										cerr << "Errore, lato non trovato" << endl;
+										}
+									if (l_v1_bj == -1){
+										cerr << "Errore, lato non trovato" << endl;
+										}
+									mesh_2.Cell2DsVertices.push_back({bar_i, v1_i, bar_j});
+									mesh_2.Cell2DsEdges.push_back({l_v1_bi, l_v1_bj, l_count});
+
+ 									// creo triangolo con v2 e i due baricentri, prima recupero gli id dei lati
+									unsigned int l_v2_bi = esiste_gia_1D(v2_i, bar_i, mesh_2);
+									unsigned int l_v2_bj = esiste_gia_1D(v2_i, bar_j, mesh_2);
+									if (l_v2_bi == -1){
+										cerr << "Errore, lato non trovato" << endl;
+										}
+									if (l_v2_bj == -1){
+										cerr << "Errore, lato non trovato" << endl;
+										}
+									mesh_2.Cell2DsVertices.push_back({bar_i, v2_i, bar_j});
+									mesh_2.Cell2DsEdges.push_back({l_v2_bi, l_v2_bj, l_count});
+									l_count ++;
+									
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+	}
+	
+	// adesso aggiorno mesh_2 Cell3Ds
+	mesh_2.Cell3DsNumVert = mesh_2.NumCell0Ds;
+	mesh_2.Cell3DsNumEdg = mesh_2.NumCell1Ds;
+	mesh_2.Cell3DsNumFaces = mesh_2.NumCell2Ds;
+
+	return true;
 }
 
-*/
 
 
 
