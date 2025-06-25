@@ -12,10 +12,10 @@ int main(){
 	
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
-	int p=4; 
+	int p=3; 
 	int q=3;
-	int b=1; //e se b=0 o 1...vedere
-	int c=0;
+	int b=2; //e se b=0 o 1...vedere
+	int c=2;
 	unsigned int id1 = 0;
 	unsigned int id2 = 2;
 	

@@ -681,7 +681,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 		num_lati = 30;
 	}
 
-	// Per effettuare la triangolazione di classe II, sfrutto il poliedro di partenza (3, q, 0, 0) e la sua triangolazione di classe I di parametri (3, q, b, 0). Ricavo tutti i vertici che otterrò (dalla triangolazione di classe II) sui lati del poliedro.
+	// Per effettuare la triangolazione di classe II, sfrutto il poliedro di partenza (3, q, 0, 0) e la sua triangolazione di classe I di parametri (3, q, b, 0). Ricavo inizialmente tutti i vertici che otterrò (dalla triangolazione di classe II) sui lati del poliedro, e li salvo nella matrice matr_vert_lati.
 	PolygonalMesh poliedro = mesh_2;
 	PolygonalMesh mesh = mesh_2;
 	
@@ -715,16 +715,19 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	
 	mesh_2.Cell0DsId = {};
 	mesh_2.Cell0DsId.reserve(num_vertices);
-	iota(mesh_2.Cell0DsId.begin(), mesh_2.Cell0DsId.end(), 0); // non funziona
-	
+	for (unsigned int i = 0; i< num_vertices; i++){
+		mesh_2.Cell0DsId.push_back(i);
+		}
 	mesh_2.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh_2.NumCell0Ds);
 
 	// Cell1Ds
 	mesh_2.NumCell1Ds = num_lati*b*b+(6*b*b-(b-1)*b/2*3)*num_facc;
-	
+
 	mesh_2.Cell1DsId = {};
 	mesh_2.Cell1DsId.reserve(mesh_2.NumCell1Ds);
-	iota(mesh_2.Cell1DsId.begin(), mesh_2.Cell1DsId.end(), 0); // non funziona
+	for (unsigned int i = 0; i< mesh_2.NumCell1Ds; i++){
+		mesh_2.Cell1DsId.push_back(i);
+		}
 	
 	mesh_2.Cell1DsExtrema = Eigen::MatrixXi(2, mesh_2.NumCell1Ds);
 	
@@ -734,7 +737,9 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	
 	mesh_2.Cell2DsId={};
 	mesh_2.Cell2DsId.reserve(F);
-	iota(mesh_2.Cell2DsId.begin(), mesh_2.Cell2DsId.end(), 0);
+	for (unsigned int i = 0; i< F; i++){
+		mesh_2.Cell2DsId.push_back(i);
+		}
 
 	mesh_2.Cell2DsNumVert.assign(F,3);
 	mesh_2.Cell2DsNumEdg.assign(F,3);
@@ -744,7 +749,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	mesh_2.Cell2DsEdges={};
 	mesh_2.Cell2DsEdges.reserve(mesh.NumCell2Ds);
 	
-	// creo una matrice che abbia, come colonne, le componenti (x,y,z) dei baricentri delle facce di mesh, in modo che siano ordinati come le facce di mesh.
+	// creo una matrice che abbia, come colonne, le componenti (x,y,z) dei baricentri delle facce di mesh.
 
 	MatrixXd matr_bar_facce = MatrixXd::Zero(3,mesh.NumCell2Ds); 
 	for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
@@ -753,15 +758,15 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	}
 
 	// Adesso itero sulle facce del poliedro, e per ogni faccia itero sui triangoli in mesh che fanno parte di questa, aggiungendo vertici, lati e facce a mesh_2.
-	info_mesh(mesh);
 	unsigned int v_count = 0;
 	unsigned int l_count = 0;
 	for (unsigned int i=0;i<num_facc;i++){ // itero sulle facce del poliedro
-		// creo delle strutture in cui salverò i vertici dei lati presenti in mesh che non sono parte di mesh_2, e il baricentro del triangolo di cui fanno parte
+		// Creo delle strutture in cui salverò i vertici dei lati presenti in mesh che non sono parte di mesh_2, e il baricentro del triangolo di cui fanno parte
 		VectorXd baricentri_faccia_grande = VectorXd::Zero((b-1)*b*3);
 		MatrixXd estremi_lato_baricentro = MatrixXd::Zero(2, (b-1)*b*3);
 		unsigned int bar_count = 0;
-
+		
+		// Con l'indice k itero sulle facce di mesh, salvando i vertici con i nuovi id in mesh_2. Successivamente, calcolo le coordinate dei tre punti medi dei vertici e il baricentro. Salvo quest'ultimo in mesh_2 e creo i lati tra vertici e baricentro.
 		for (unsigned int k=0;k<b*b;k++){
 			unsigned int v_1= mesh.Cell2DsVertices[i*b*b+k][0];
 			unsigned int v_2= mesh.Cell2DsVertices[i*b*b+k][1];
@@ -818,14 +823,17 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 				mesh_2.Cell1DsExtrema.col(l_count) << id_v3, id_bar_corrente;
 				l_count ++;
 				}
+			// Inizializzo tre valori booleani, uno per ogni punto medio, per verificare se esistono (o meno) in mesh_2, confrontandoli con i vertici in matr_vert_lati.
+			
 			bool check_m1 = false;
 			bool check_m2 = false;
 			bool check_m3 = false;
 
-			for(unsigned int j=0;j<numero_vert_su_lati;j++){ // indice sul vettore dei vertici: j
-				// controllo su m_1
-				if ((matr_vert_lati.col(j) - m_1).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
-					// salvare i vertici in mesh_2 e salvare i dati attraverso gli id
+			for(unsigned int j=0;j<numero_vert_su_lati;j++){ 
+				
+				// Controllo su m_1
+				if ((matr_vert_lati.col(j) - m_1).norm() < 1e-12){
+					// Se trovo una corrispondenza con i vertici salvati in matr_vert_lati, salvo il punto medio, i lati che forma con i vertici e con il baricentro e le due facce che si formano.
 					int id_m_1 = Esiste_gia(mesh_2, m_1, v_count);
 					if (id_m_1 == -1){
 						id_m_1 = v_count;
@@ -861,7 +869,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 					}
 
 					
-				// controllo su m_2
+				// controllo su m_2, analogo a m_1.
 				if ((matr_vert_lati.col(j) - m_2).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
 					int id_m_2 = Esiste_gia(mesh_2, m_2, v_count);
 					if (id_m_2 == -1){
@@ -897,7 +905,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 					
 					}
 
-				// controllo su m_3
+				// controllo su m_3, analogo a m_1.
 				if ((matr_vert_lati.col(j) - m_3).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
 					int id_m_3 = Esiste_gia(mesh_2, m_3, v_count);
 					if (id_m_3 == -1){
@@ -933,7 +941,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 
 					}
 			}
-
+			// Fuori dal ciclo, se non c'è stata corrispondenza per i punti medi, salvo il baricentro e gli id dei vertici del lato che contiene il punto medio. In questo caso, andrò a creare i lati tra baricentri di triangoli adiacenti e le relative facce con i vertici.
 			if (check_m1 == false){
 				baricentri_faccia_grande[bar_count] = id_bar_corrente;
 				estremi_lato_baricentro.col(bar_count) << id_v1, id_v2;
@@ -950,7 +958,8 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 				bar_count ++;
 				}
 		}
-		// adesso itero su baricentri_faccia_grande e estremi_lato_baricentro
+		// Adesso itero su baricentri_faccia_grande e estremi_lato_baricentro. Il primo contiene gli id dei baricentri dei triangoli per cui non esistevano i punti medi. Se, per esempio, per il triangolo k non esiste nessun punto medio, salvo tre volte l'id del baricentro k-esimo. La matrice, invece, contiene gli id dei vertici del lato per cui non esiste il punto medio.
+		// Operativamente, scorro le colonne della matrice cercando per quali baricentri corrispondono vertici uguali (cioè i corrispettivi triangoli sono adiacenti lungo il lato con estremi i vertici), creo un lato tra i baricentri e le due facce che questo lato forma con i vertici.
 		VectorXd indici_visitati = VectorXd::Zero(b*(b-1)*3); 
 		for (unsigned int i_=0; i_<(b-1)*b*3-1; i_++){
 			
@@ -1007,7 +1016,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 			}
 	}
 	
-	// adesso aggiorno mesh_2 Cell3Ds
+	// Infine aggiorno Cell3Ds in mesh_2
 	mesh_2.Cell3DsNumVert = mesh_2.NumCell0Ds;
 	mesh_2.Cell3DsNumEdg = mesh_2.NumCell1Ds;
 	mesh_2.Cell3DsNumFaces = mesh_2.NumCell2Ds;
