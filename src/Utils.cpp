@@ -27,7 +27,7 @@ namespace PolygonalLibrary
 	
 	
 // TODO controllo su p, dentro la finzione o fuori?
-bool valorizza_poliedro(int q, PolygonalMesh& mesh){
+bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 	
 	if (q==3){
 		//Cell0Ds
@@ -312,7 +312,15 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 	
 }
 
-
+bool converti_uns_int(const char* str, unsigned int& numero_conv){
+	istringstream iss(str);
+	int temp;
+    if ((iss >> temp) && iss.eof() && temp >= 0) {
+        numero_conv = static_cast<unsigned int>(temp);
+        return true;
+    }
+    return false;
+}
 
 bool controllo_lati_vertici (const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
@@ -665,6 +673,7 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
+
 bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	
 	unsigned int T = 3*b*b;

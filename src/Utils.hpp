@@ -8,7 +8,7 @@ using namespace std;
 namespace PolygonalLibrary
 {
 
-bool valorizza_poliedro(int q, PolygonalMesh& mesh); 
+bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh); 
 
 bool controllo_lati_vertici (const PolygonalMesh& mesh);
 
@@ -76,7 +76,7 @@ Grafo costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, cons
 vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
 										  const vector<unsigned int>& facce_vicinato_v);
 
-
+bool converti_uns_int(const char* str, unsigned int& out);
 
 }
 
