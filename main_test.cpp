@@ -10,7 +10,7 @@
 #include "test_tri_lati_facce.hpp"
 #include "test_giro_attorno_vertice.hpp"
 #include "test_CostruisciDualeMesh.hpp"
-<<<<<<< HEAD
+
 #include "test_trova_cammino.hpp"
 #include "test_proiezione_sfera.hpp"
 #include "test_costruisci_grafo.hpp"
@@ -19,11 +19,7 @@
 #include "test_salvataggio_Cell1D.hpp"
 #include "test_salvataggio_Cell2D.hpp"
 #include "test_salvataggio_Cell3D.hpp"
-=======
-//#include "test_trova_cammino.hpp"
-//#include "test_proiezione_sfera.hpp"
 #include "test_controllo_lati_vertici.hpp"
->>>>>>> de25665bcf11bdf83f2b8e1aedf637d95e5b3bfa
 
 
 

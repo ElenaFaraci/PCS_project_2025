@@ -376,7 +376,7 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b
 	Eigen::Vector3d vertex1 = mesh.Cell0DsCoordinates.col(id1);
 	Eigen::Vector3d vertex2 = mesh.Cell0DsCoordinates.col(id2);
 	
-	if ((vertex2 - vertex1).norm() < 1e-12) {
+	if ((vertex2 - vertex1).norm() < 1e-10) {
         cerr << "Attenzione: vertex1 e vertex2 coincidono, non si può interpolare" << endl;
         return vertex1;
     }
@@ -387,7 +387,7 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b
 
 
 int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsigned int k) {				   
-	double epsilon = 1e-11;
+	double epsilon = 1e-10;
     for (int i = 0; i < k; ++i) {
         if ((mesh.Cell0DsCoordinates.col(i) - nuovo_vertice).norm() < epsilon) {
             return i; // vertice esistente trovato
