@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "PolygonalMesh.hpp"
 #include "Utils.hpp"
 #include "UCDUtilities.hpp"
@@ -8,16 +9,62 @@ using namespace Eigen;
 using namespace PolygonalLibrary;
 
 
-int main(){
+
+int main(int argc, char *argv[]){
+	
+	
+	/*
+	 int p=3; 
+	 int q=3;
+	 int b=2; 
+	 int c=0;
+	unsigned int id1=0;
+	unsigned int id2=2;
+	*/
+	
+	unsigned int p; 
+	unsigned int q;
+	unsigned int b; 
+	unsigned int c;
+	unsigned int id1;
+	unsigned int id2;
+	
+	bool flag_cammino = false;
+	
+	if (argc == 5){
+		array<unsigned int*, 4> punt_var = { &p, &q, &b, &c };
+		for (unsigned int i =0;i<punt_var.size();i++){
+			if (!converti_uns_int(argv[i+1],*punt_var[i])){
+				cerr<<"è stato inserito un valore non valido: "<<argv[i+1]<<endl;
+				return 1;
+			}
+		}
+		
+	}else if (argc == 7){
+		array<unsigned int*, 6> punt_var = { &p, &q, &b, &c, &id1, &id2 };
+		for (unsigned int i =0;i<punt_var.size();i++){
+			if (!converti_uns_int(argv[i+1],*punt_var[i])){
+				cerr<<"è stato inserito un valore non valido: "<<argv[i+1]<<endl;
+				return 1;
+			}
+		}
+		
+		flag_cammino = true;
+	} else{
+		cerr<<"Il numero di argomenti passati non è contemplato"<<endl;
+		return 1;
+	}
+	cout << "Valori letti:"<<endl;
+    cout << "p = " << p << ", q = " << q << ", b = " << b << ", c = " << c << endl;
+	if (flag_cammino){
+		cout<<"id1: "<<id1<<" id2: "<<id2<<endl;
+	}
 	
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
-	int p=3; 
-	int q=3;
-	int b=2; //e se b=0 o 1...vedere
-	int c=2;
-	unsigned int id1 = 0;
-	unsigned int id2 = 2;
+	
+	
+	
 	
 	// dobbiamo controllare l'input, positività, interi ecc...
 	
@@ -32,7 +79,8 @@ int main(){
 			cerr<<"errore inserimento di p (primo valore passato)"<<endl;
 			return 1;
 		}
-		int tmp=p;
+		
+		unsigned int tmp=p;
 		p=q;
 		q=tmp;
 		flag_duale=true;
@@ -62,7 +110,7 @@ int main(){
 			bool f= Triangolazione(mesh, b, c, q);
 		}
 	} else{
-		bool f= triangolazione_2(mesh, b, q);
+		//bool f= triangolazione_2(mesh, b, q);
 	}
 	
 	
@@ -88,7 +136,9 @@ int main(){
 		return 1;
 		}	
 		proiezione_su_sfera_unitaria(duale);
-		trova_cammino_minimo(duale, id1, id2);
+		if (flag_cammino){
+			trova_cammino_minimo(duale, id1, id2);
+		}
 		
 		Gedim::UCDUtilities utilities;
     {   
@@ -105,7 +155,9 @@ int main(){
 	}
 	else {
 		proiezione_su_sfera_unitaria(mesh);
-		trova_cammino_minimo(mesh, id1, id2);
+		if (flag_cammino){
+			trova_cammino_minimo(mesh, id1, id2);
+		}
 	}
 	
 	
