@@ -27,7 +27,7 @@ namespace PolygonalLibrary
 	
 	
 // TODO controllo su p, dentro la finzione o fuori?
-bool valorizza_poliedro(int q, PolygonalMesh& mesh){
+bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 	
 	if (q==3){
 		//Cell0Ds
@@ -840,14 +840,15 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 			for(unsigned int j=0;j<numero_vert_su_lati;j++){ 
 				
 				// Controllo su m_1
-				if ((matr_vert_lati.col(j) - m_1).norm() < 1e-12){
+				if ((matr_vert_lati.col(j) - m_1).norm() < 1e-10){
 					// Se trovo una corrispondenza con i vertici salvati in matr_vert_lati, salvo il punto medio, i lati che forma con i vertici e con il baricentro e le due facce che si formano.
-					int id_m_1 = Esiste_gia(mesh_2, m_1, v_count);
-					if (id_m_1 == -1){
-						id_m_1 = v_count;
+					int id = Esiste_gia(mesh_2, m_1, v_count);
+					if (id == -1){
+						id = v_count;
 						mesh_2.Cell0DsCoordinates.col(v_count) = m_1;
 						v_count ++;
 						}
+					unsigned int id_m_1 = id;
 					
 					int l_m1_v1 = esiste_gia_1D(id_m_1, id_v1, mesh_2);
 					if (l_m1_v1 == -1){
@@ -865,11 +866,11 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 					
 					mesh_2.Cell1DsExtrema.col(l_count) << id_m_1, id_bar_corrente;
 
-					mesh_2.Cell2DsVertices.push_back({id_bar_corrente, id_v1, id_m_1});
-					mesh_2.Cell2DsVertices.push_back({id_m_1, id_v2, id_bar_corrente});
+					mesh_2.Cell2DsVertices.push_back({static_cast<unsigned int>(id_bar_corrente), static_cast<unsigned int>(id_v1), static_cast<unsigned int>(id_m_1)});
+					mesh_2.Cell2DsVertices.push_back({static_cast<unsigned int>(id_m_1), static_cast<unsigned int>(id_v2), static_cast<unsigned int>(id_bar_corrente)});
 					
-					mesh_2.Cell2DsEdges.push_back({id_v1_b, l_m1_v1, l_count});
-					mesh_2.Cell2DsEdges.push_back({l_m1_v2, id_v2_b, l_count});
+					mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(id_v1_b), static_cast<unsigned int>(l_m1_v1), l_count});
+					mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_m1_v2), static_cast<unsigned int>(id_v2_b), l_count});
 					
 					l_count ++;
 					check_m1 = true;
@@ -878,7 +879,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 
 					
 				// controllo su m_2, analogo a m_1.
-				if ((matr_vert_lati.col(j) - m_2).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
+				if ((matr_vert_lati.col(j) - m_2).norm() < 1e-10){
 					int id_m_2 = Esiste_gia(mesh_2, m_2, v_count);
 					if (id_m_2 == -1){
 						id_m_2 = v_count;
@@ -902,11 +903,11 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 
 					mesh_2.Cell1DsExtrema.col(l_count) << id_m_2, id_bar_corrente;
 					
-					mesh_2.Cell2DsVertices.push_back({id_bar_corrente, id_v1, id_m_2});
-					mesh_2.Cell2DsVertices.push_back({id_m_2, id_v3, id_bar_corrente});
+					mesh_2.Cell2DsVertices.push_back({static_cast<unsigned int>(id_bar_corrente), static_cast<unsigned int>(id_v1), static_cast<unsigned int>(id_m_2)});
+					mesh_2.Cell2DsVertices.push_back({static_cast<unsigned int>(id_m_2), static_cast<unsigned int>(id_v3), static_cast<unsigned int>(id_bar_corrente)});
 					
-					mesh_2.Cell2DsEdges.push_back({id_v1_b, l_m2_v1, l_count});
-					mesh_2.Cell2DsEdges.push_back({l_m2_v3, id_v3_b, l_count});
+					mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(id_v1_b), static_cast<unsigned int>(l_m2_v1), l_count});
+					mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_m2_v3), static_cast<unsigned int>(id_v3_b), l_count});
 
 					l_count ++;
 					check_m2 = true;
@@ -914,7 +915,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 					}
 
 				// controllo su m_3, analogo a m_1.
-				if ((matr_vert_lati.col(j) - m_3).norm() < 1e-12){ // verificare sia sempre la stessa epsilon
+				if ((matr_vert_lati.col(j) - m_3).norm() < 1e-10){
 					int id_m_3 = Esiste_gia(mesh_2, m_3, v_count);
 					if (id_m_3 == -1){
 						id_m_3 = v_count;
@@ -938,11 +939,11 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 					
 					mesh_2.Cell1DsExtrema.col(l_count) << id_m_3, id_bar_corrente;
 					
-					mesh_2.Cell2DsVertices.push_back({id_bar_corrente, id_v3, id_m_3});
-					mesh_2.Cell2DsVertices.push_back({id_m_3, id_v2, id_bar_corrente});
+					mesh_2.Cell2DsVertices.push_back({static_cast<unsigned int>(id_bar_corrente), static_cast<unsigned int>(id_v3), static_cast<unsigned int>(id_m_3)});
+					mesh_2.Cell2DsVertices.push_back({static_cast<unsigned int>(id_m_3), static_cast<unsigned int>(id_v2), static_cast<unsigned int>(id_bar_corrente)});
 					
-					mesh_2.Cell2DsEdges.push_back({id_v3_b, l_m3_v3, l_count});
-					mesh_2.Cell2DsEdges.push_back({l_m3_v2, id_v2_b, l_count});
+					mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(id_v3_b), static_cast<unsigned int>(l_m3_v3), l_count});
+					mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_m3_v2), static_cast<unsigned int>(id_v2_b), l_count});
 
 					l_count ++;
 					check_m3 = true;
@@ -1000,11 +1001,11 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 										cerr << "Errore, lato non trovato" << endl;
 										}
 									mesh_2.Cell2DsVertices.push_back({bar_i, v1_i, bar_j});
-									mesh_2.Cell2DsEdges.push_back({l_v1_bi, l_v1_bj, l_count});
+									mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_v1_bi), static_cast<unsigned int>(l_v1_bj), l_count});
 
  									// creo triangolo con v2 e i due baricentri, prima recupero gli id dei lati
-									unsigned int l_v2_bi = esiste_gia_1D(v2_i, bar_i, mesh_2);
-									unsigned int l_v2_bj = esiste_gia_1D(v2_i, bar_j, mesh_2);
+									int l_v2_bi = esiste_gia_1D(v2_i, bar_i, mesh_2);
+									int l_v2_bj = esiste_gia_1D(v2_i, bar_j, mesh_2);
 									if (l_v2_bi == -1){
 										cerr << "Errore, lato non trovato" << endl;
 										}
@@ -1012,7 +1013,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 										cerr << "Errore, lato non trovato" << endl;
 										}
 									mesh_2.Cell2DsVertices.push_back({bar_i, v2_i, bar_j});
-									mesh_2.Cell2DsEdges.push_back({l_v2_bi, l_v2_bj, l_count});
+									mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_v2_bi), static_cast<unsigned int>(l_v2_bj), l_count});
 									l_count ++;
 									
 									}
@@ -1047,7 +1048,7 @@ void proiezione_su_sfera_unitaria(PolygonalMesh& mesh) {
 	
     for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
         double r = mesh.Cell0DsCoordinates.col(i).norm();
-        if (std::abs(r - 1.0) > 1e-6) {
+        if (std::abs(r - 1.0) > 1e-10) {
             std::cerr << "il vertice " << i << " ha raggio = " << r << "\n";
         }
     }

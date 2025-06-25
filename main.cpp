@@ -21,7 +21,6 @@ int main(int argc, char *argv[]){
 	unsigned int id1=0;
 	unsigned int id2=2;
 	*/
-	
 	unsigned int p; 
 	unsigned int q;
 	unsigned int b; 
@@ -110,7 +109,7 @@ int main(int argc, char *argv[]){
 			bool f= Triangolazione(mesh, b, c, q);
 		}
 	} else{
-		//bool f= triangolazione_2(mesh, b, q);
+		bool f= triangolazione_2(mesh, b, q);
 	}
 	
 	
