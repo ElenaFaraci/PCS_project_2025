@@ -675,7 +675,6 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 ///////////////////////////////////////////////////////////////////////////////////////////
 bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	
-	unsigned int T = 3*b*b;
 	unsigned int num_facc;
 	unsigned int num_lati;
 	if (q==3){
@@ -688,16 +687,14 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 		num_facc=20;
 		num_lati = 30;
 	}
-
 	// Per effettuare la triangolazione di classe II, sfrutto il poliedro di partenza (3, q, 0, 0) e la sua triangolazione di classe I di parametri (3, q, b, 0). Ricavo inizialmente tutti i vertici che otterrò (dalla triangolazione di classe II) sui lati del poliedro, e li salvo nella matrice matr_vert_lati.
 	PolygonalMesh poliedro = mesh_2;
 	PolygonalMesh mesh = mesh_2;
-	
 	bool stato1 = Triangolazione(mesh, b, 0, q);
 	if(!stato1){
 		cout<<"errore chiamata triangolazione in triangolazione_2"<<endl;
 	}
-
+	info_mesh(mesh_2);
 	unsigned int numero_vert_su_lati = poliedro.NumCell0Ds + poliedro.NumCell1Ds*(2*b-1);
 	MatrixXd matr_vert_lati = MatrixXd::Zero(3,numero_vert_su_lati);
 	unsigned int count=0;
@@ -729,7 +726,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	mesh_2.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh_2.NumCell0Ds);
 
 	// Cell1Ds
-	mesh_2.NumCell1Ds = num_lati*b*b+(6*b*b-(b-1)*b/2*3)*num_facc;
+	mesh_2.NumCell1Ds = num_lati*2*b+(6*b*b-(b-1)*b/2*3)*num_facc;
 
 	mesh_2.Cell1DsId = {};
 	mesh_2.Cell1DsId.reserve(mesh_2.NumCell1Ds);
@@ -773,9 +770,9 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 		VectorXd baricentri_faccia_grande = VectorXd::Zero((b-1)*b*3);
 		MatrixXd estremi_lato_baricentro = MatrixXd::Zero(2, (b-1)*b*3);
 		unsigned int bar_count = 0;
-		
 		// Con l'indice k itero sulle facce di mesh, salvando i vertici con i nuovi id in mesh_2. Successivamente, calcolo le coordinate dei tre punti medi dei vertici e il baricentro. Salvo quest'ultimo in mesh_2 e creo i lati tra vertici e baricentro.
 		for (unsigned int k=0;k<b*b;k++){
+			
 			unsigned int v_1= mesh.Cell2DsVertices[i*b*b+k][0];
 			unsigned int v_2= mesh.Cell2DsVertices[i*b*b+k][1];
 			unsigned int v_3= mesh.Cell2DsVertices[i*b*b+k][2];
@@ -809,10 +806,10 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 			Vector3d m_1 = Nuovo_Vertice(id_v1, id_v2, 2, 1, mesh_2);
 			Vector3d m_2 = Nuovo_Vertice(id_v1, id_v3, 2, 1, mesh_2);
 			Vector3d m_3 = Nuovo_Vertice(id_v2, id_v3, 2, 1, mesh_2);
-			
 			Vector3d baricentro_corrente = matr_bar_facce.col(i*b*b+k); 
 			unsigned int id_bar_corrente = v_count;
 			mesh_2.Cell0DsCoordinates.col(v_count++)=baricentro_corrente;
+
 			int id_v1_b = esiste_gia_1D(id_v1, id_bar_corrente, mesh_2);
 			if (id_v1_b == -1){
 				id_v1_b = l_count;
@@ -838,7 +835,6 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 			bool check_m3 = false;
 
 			for(unsigned int j=0;j<numero_vert_su_lati;j++){ 
-				
 				// Controllo su m_1
 				if ((matr_vert_lati.col(j) - m_1).norm() < 1e-10){
 					// Se trovo una corrispondenza con i vertici salvati in matr_vert_lati, salvo il punto medio, i lati che forma con i vertici e con il baricentro e le due facce che si formano.
@@ -876,7 +872,6 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 					check_m1 = true;
 					
 					}
-
 					
 				// controllo su m_2, analogo a m_1.
 				if ((matr_vert_lati.col(j) - m_2).norm() < 1e-10){
@@ -969,66 +964,76 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 		}
 		// Adesso itero su baricentri_faccia_grande e estremi_lato_baricentro. Il primo contiene gli id dei baricentri dei triangoli per cui non esistevano i punti medi. Se, per esempio, per il triangolo k non esiste nessun punto medio, salvo tre volte l'id del baricentro k-esimo. La matrice, invece, contiene gli id dei vertici del lato per cui non esiste il punto medio.
 		// Operativamente, scorro le colonne della matrice cercando per quali baricentri corrispondono vertici uguali (cioè i corrispettivi triangoli sono adiacenti lungo il lato con estremi i vertici), creo un lato tra i baricentri e le due facce che questo lato forma con i vertici.
-		VectorXd indici_visitati = VectorXd::Zero(b*(b-1)*3); 
-		for (unsigned int i_=0; i_<(b-1)*b*3-1; i_++){
-			
-			if (indici_visitati[i_]==0){
-				unsigned int bar_i = baricentri_faccia_grande[i_];
-				unsigned int v_1 = estremi_lato_baricentro(0, i_);
-				unsigned int v_2 = estremi_lato_baricentro(1, i_);
-				unsigned int v1_i = min(v_1, v_2);
-				unsigned int v2_i= max(v_1, v_2);
-				for (unsigned int j_=1; j_<(b-1)*b*3; j_++){
-					if (indici_visitati[j_]==0){
-						unsigned int bar_j = baricentri_faccia_grande[j_];
-						if (bar_j != bar_i){
-							unsigned int v_1_ = estremi_lato_baricentro(0, j_);
-							unsigned int v_2_ = estremi_lato_baricentro(1, j_);
-							unsigned int v1_j = min(v_1_, v_2_);
-							unsigned int v2_j = max(v_1_, v_2_);
-							if (v1_i == v1_j){
-								if (v2_i == v2_j){
-									indici_visitati[j_] = 1;
-									mesh_2.Cell1DsExtrema.col(l_count) << bar_i, bar_j; 
-									
-									// creo triangolo con v1 e i due baricentri, prima recupero gli id dei lati
-									int l_v1_bi = esiste_gia_1D(v1_i, bar_i, mesh_2);
-									int l_v1_bj = esiste_gia_1D(v1_i, bar_j, mesh_2);
-									if (l_v1_bi == -1){
-										cerr << "Errore, lato non trovato" << endl;
+		VectorXd indici_visitati = VectorXd::Zero(b*(b-1)*3);
+		if (b != 1){
+			for (unsigned int i_=0; i_<(b-1)*b*3-1; i_++){
+				if (indici_visitati[i_]==0){
+					unsigned int bar_i = baricentri_faccia_grande[i_];
+					unsigned int v_1 = estremi_lato_baricentro(0, i_);
+					unsigned int v_2 = estremi_lato_baricentro(1, i_);
+					unsigned int v1_i = min(v_1, v_2);
+					unsigned int v2_i= max(v_1, v_2);
+					for (unsigned int j_=1; j_<(b-1)*b*3; j_++){
+						if (indici_visitati[j_]==0){
+							unsigned int bar_j = baricentri_faccia_grande[j_];
+							if (bar_j != bar_i){
+								unsigned int v_1_ = estremi_lato_baricentro(0, j_);
+								unsigned int v_2_ = estremi_lato_baricentro(1, j_);
+								unsigned int v1_j = min(v_1_, v_2_);
+								unsigned int v2_j = max(v_1_, v_2_);
+								if (v1_i == v1_j){
+									if (v2_i == v2_j){
+										indici_visitati[j_] = 1;
+										mesh_2.Cell1DsExtrema.col(l_count) << bar_i, bar_j; 
+										
+										// creo triangolo con v1 e i due baricentri, prima recupero gli id dei lati
+										int l_v1_bi = esiste_gia_1D(v1_i, bar_i, mesh_2);
+										int l_v1_bj = esiste_gia_1D(v1_i, bar_j, mesh_2);
+										if (l_v1_bi == -1){
+											cerr << "Errore, lato non trovato" << endl;
+											}
+										if (l_v1_bj == -1){
+											cerr << "Errore, lato non trovato" << endl;
+											}
+										mesh_2.Cell2DsVertices.push_back({bar_i, v1_i, bar_j});
+										mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_v1_bi), static_cast<unsigned int>(l_v1_bj), l_count});
+	
+										// creo triangolo con v2 e i due baricentri, prima recupero gli id dei lati
+										int l_v2_bi = esiste_gia_1D(v2_i, bar_i, mesh_2);
+										int l_v2_bj = esiste_gia_1D(v2_i, bar_j, mesh_2);
+										if (l_v2_bi == -1){
+											cerr << "Errore, lato non trovato" << endl;
+											}
+										if (l_v2_bj == -1){
+											cerr << "Errore, lato non trovato" << endl;
+											}
+										mesh_2.Cell2DsVertices.push_back({bar_i, v2_i, bar_j});
+										mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_v2_bi), static_cast<unsigned int>(l_v2_bj), l_count});
+										l_count ++;
+										
 										}
-									if (l_v1_bj == -1){
-										cerr << "Errore, lato non trovato" << endl;
-										}
-									mesh_2.Cell2DsVertices.push_back({bar_i, v1_i, bar_j});
-									mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_v1_bi), static_cast<unsigned int>(l_v1_bj), l_count});
-
- 									// creo triangolo con v2 e i due baricentri, prima recupero gli id dei lati
-									int l_v2_bi = esiste_gia_1D(v2_i, bar_i, mesh_2);
-									int l_v2_bj = esiste_gia_1D(v2_i, bar_j, mesh_2);
-									if (l_v2_bi == -1){
-										cerr << "Errore, lato non trovato" << endl;
-										}
-									if (l_v2_bj == -1){
-										cerr << "Errore, lato non trovato" << endl;
-										}
-									mesh_2.Cell2DsVertices.push_back({bar_i, v2_i, bar_j});
-									mesh_2.Cell2DsEdges.push_back({static_cast<unsigned int>(l_v2_bi), static_cast<unsigned int>(l_v2_bj), l_count});
-									l_count ++;
-									
 									}
 								}
 							}
 						}
 					}
 				}
-			}
+		}
 	}
-	
+
 	// Infine aggiorno Cell3Ds in mesh_2
 	mesh_2.Cell3DsNumVert = mesh_2.NumCell0Ds;
 	mesh_2.Cell3DsNumEdg = mesh_2.NumCell1Ds;
 	mesh_2.Cell3DsNumFaces = mesh_2.NumCell2Ds;
+	
+	mesh_2.Cell3DsVertices.resize(mesh_2.NumCell0Ds);
+	iota(mesh_2.Cell3DsVertices.begin(), mesh_2.Cell3DsVertices.end(), 0);
+	
+	mesh_2.Cell3DsEdges.resize(mesh_2.NumCell1Ds);
+	iota(mesh_2.Cell3DsEdges.begin(), mesh_2.Cell3DsEdges.end(), 0);
+	
+	mesh_2.Cell3DsFaces.resize(mesh_2.NumCell2Ds);
+	iota(mesh_2.Cell3DsFaces.begin(), mesh_2.Cell3DsFaces.end(), 0);
 
 	return true;
 }
