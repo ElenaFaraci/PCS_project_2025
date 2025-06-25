@@ -1042,17 +1042,26 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 
 
 
-//Proiezione su sfera unitaria e controllo 
+// Proiezione su sfera unitaria e controllo:
+// normalizza tutti i vertici della mesh per proiettarli su una sfera unitaria
 void proiezione_su_sfera_unitaria(PolygonalMesh& mesh) {
+	// inizio scorrendo tutti i vertici della mesh
     for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
+		// ora estraggo il vettore in posizione i
         Vector3d vertice = mesh.Cell0DsCoordinates.col(i);
+		// chiamo normalize() che rende tale vettore unitario (di lunghezza 1)
         vertice.normalize(); 
+		// sostituisco il vettore originario della mesh con quello normalizzato
         mesh.Cell0DsCoordinates.col(i) = vertice;
     }
 	
+	// scorro nuovamente i vertici appena normalizzati
     for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
+		// calcolo la norma, che rappresenta la distanza dall'origine, di ciascun vertice
         double r = mesh.Cell0DsCoordinates.col(i).norm();
+		// nell'if controllo che la norma sia uguale ad 1 più una piccola soglia
         if (std::abs(r - 1.0) > 1e-10) {
+			// se così non fosse stampo un messaggio di errore
             std::cerr << "il vertice " << i << " ha raggio = " << r << "\n";
         }
     }
@@ -1150,16 +1159,24 @@ void info_mesh(const PolygonalMesh& mesh){
 
 }
 // Funzioni di salvataggio e stampa celle in txt
-//Cella 0D
+// Cella 0D
+// Questa funzione salva e stampa i vertici del nostro poliedro
 void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename) {
-    std::ofstream file(filename);
+    // apro un file in scrittura in cui scrivo l'intestazione
+	std::ofstream file(filename);
 	file << "-- Cell0D --"<<endl<<endl;
+	
+	// scrivo il numero di vertici totali
 	file << "Numero di Cell0Ds: " << mesh.NumCell0Ds <<endl << endl;
+	
+	// scrivo la lista degli ID dei vertici
 	file << "Identificativi: "<< endl <<endl;
 	for (unsigned int j = 0; j< mesh.NumCell0Ds; j++){
 		file << mesh.Cell0DsId[j]<<endl;
 	}
 	file << "\n";
+	
+	// scrivo le coordinate 3D di ciascun vertice
 	file << "Coordinate: "<<endl<<endl;
     for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
 		file << mesh.Cell0DsCoordinates.col(i)[0] << " "<< mesh.Cell0DsCoordinates.col(i)[1]<<" "<<mesh.Cell0DsCoordinates.col(i)[2]<<endl;
@@ -1167,16 +1184,23 @@ void salvataggio_Cell0Ds(const PolygonalMesh& mesh, const std::string& filename)
     file.close();
 }
 
-//Cella 1D
+// Cella 1D
+// questa funzione salva gli spigoli del nostro poliedro, ovvero le coppie di vertici
 void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
+	
+	// scrivo intestazione e numero totale di spigoli
 	file << "-- Cell1D --"<<endl<<endl;
 	file << "Numero di Cell1Ds: " << mesh.NumCell1Ds <<endl << endl;
+	
+	// scrivo gli ID di ciascuna cella 1D
 	file << "Identificativi: "<<endl<<endl;
 	for (unsigned int j = 0; j< mesh.NumCell1Ds; j++){
 		file << mesh.Cell1DsId[j]<<endl;
 	}
 	file << "\n";
+	
+	// scrivo gli estremi di ciscuno spigolo
 	file << "ID Vertici:"<<endl<<endl;
     for (unsigned int i = 0; i < mesh.NumCell1Ds; i++) {
 		file << mesh.Cell1DsExtrema.col(i)[0] << " " << mesh.Cell1DsExtrema.col(i)[1]<<endl;
@@ -1184,16 +1208,21 @@ void salvataggio_Cell1Ds(const PolygonalMesh& mesh, const std::string& filename)
     file.close();
 }
 
-//Cella 2D
+// Cella 2D
+// questa funzione salva le facce del poligono
 void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename) {
-    std::ofstream file(filename);
+    // scrivo intestazione e numero totale di celle 2D
+	std::ofstream file(filename);
 	file << "-- Cell2D --"<<endl<<endl;
 	file << "Numero di Cell2Ds: " << mesh.NumCell2Ds <<endl << endl;
+	
+	// scrivo gli ID delle celle 2D
 	file << "Identificativi: "<<endl<<endl;
 	for (unsigned int z = 0; z< mesh.NumCell2Ds; z++){
 		file << mesh.Cell2DsId[z]<<endl;
 	}
 	file << "\n";
+	// di seguito scrivo per ogni cella i suoi 3 vertici ed i suoi tre lati
 	file << "Numero Vertici: "<< " " << mesh.NumCell2Ds<<endl<<endl;
 	file << "Vertici:"<<endl<<endl;
     for (unsigned int i = 0; i < mesh.NumCell2Ds; i++) {
@@ -1209,23 +1238,30 @@ void salvataggio_Cell2Ds(const PolygonalMesh& mesh, const std::string& filename)
     file.close();
 }
 
-//Cella 3D
+// Cella 3D
+// questa funzione salva le celle 3D, comprendenti vertici, lati e facce
 void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename) {
     std::ofstream file(filename);
+	// scrivo intestazione e numero di celle 3D
 	file << "-- Cell3D --"<<endl<<endl;
 	file << "Numero di Cell3Ds: " << mesh.NumCell3Ds <<endl << endl;
+	
+	// scrivo il numero e l'elenco di vertici per la cella 3D 
 	file << "Numero Vertici: "<< " " << mesh.Cell3DsNumVert<<endl<<endl;
 	file << "Vertici:"<<endl<<endl;
     for (unsigned int i = 0; i < mesh.Cell3DsNumVert; i++) {
 		file << mesh.Cell3DsVertices[i]<<endl;
 	}
-	file << "\n";
+	
+	// scrivo numero e lista dei lati
 	file << "Numero Lati: "<< " " << mesh.Cell3DsNumEdg<<endl<<endl;
 	file << "Lati:"<<endl<<endl;
 	for (unsigned int j = 0; j < mesh.Cell3DsNumEdg; j++) {
 		file << mesh.Cell3DsEdges[j]<<endl;
 	}
 	file << "\n";
+	
+	// scrivo numero e lista delle facce
 	file << "Numero Facce: "<< " " << mesh.Cell3DsNumFaces<<endl<<endl;
 	file << "Facce:"<<endl<<endl;
 	for (unsigned int k = 0; k < mesh.Cell3DsNumFaces; k++) {
@@ -1236,13 +1272,21 @@ void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename)
 
 
 
-//funzione baricentro
+// funzione baricentro
+// questa funzione calcola il baricentro di un insieme di vertici all’interno della mesh
 
 Eigen::Vector3d baricentro(const vector<unsigned int>& vertici, const PolygonalMesh& mesh) {
-    Eigen::Vector3d b = Eigen::Vector3d::Zero();
+    // inizializzo il vettore b a 0 per tutte e tre le coordinate
+	Eigen::Vector3d b = Eigen::Vector3d::Zero();
+	
+	// per ciascun indice v, accedo alla colonna v nella matrice Cell0DsCoordinates
+	// quest'ultima rappresenta il v-esimo vertice 
     for (unsigned int v : vertici) {
+		// sommo tale colonna al vettore b
         b += mesh.Cell0DsCoordinates.col(v);
     }
+	
+	// divido il vettore b per il numero di vertici al fine di ottenere la media delle coordinate, ovvero il baricentro
     return b / vertici.size();
 }
 
@@ -1470,17 +1514,26 @@ double distanza(const Vector3d& p1, const Vector3d& p2) {
     return (p1 - p2).norm();
 }
 
+// Definizione tipo grafo
+// creo un vettore di adiacenza dove ogni nodo ha una lista di coppie
+// l'int fungerà da indice del nodo adiacente mentre il double per il peso dell'arco
 using Grafo = std::vector<std::vector<std::pair<int, double>>>;
 
+// La funzione qui di seguito restituisce il grafo con pesi calcolati in base alla distanza euclidea tra vertici
 Grafo costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, const std::vector<Eigen::Vector3d>& coords) {
-    Grafo grafo(n); 
-
+    // inizializzo il grafo con n nodi vuoti
+	Grafo grafo(n); 
+	
+	// scorro ogni colonna di Cell1DsExtrema, che rappresenta un lato del grafo
+	// chiamo u e v i 2 estremi del lato
     for (int i = 0; i < Cell1DsExtrema.cols(); i++) {
         int u = Cell1DsExtrema(0, i);
         int v = Cell1DsExtrema(1, i);
-
+		
+		// calcolo la distanza euclidea tra i due estremi usando .norm()
         double peso = (coords[u] - coords[v]).norm();
-
+		
+		// aggiungo l'arco appena trovato in ambo i versi, in quanto il grafo non è orientato
         grafo[u].push_back({v, peso});
         grafo[v].push_back({u, peso});
     }
@@ -1488,36 +1541,53 @@ Grafo costruisci_grafo_pesato(int n, const Eigen::MatrixXi& Cell1DsExtrema, cons
     return grafo;
 }
 
+// Funzione Dijkstra
+// implementa l'algoritmo di Dijkstra per trovare il cammino minimo da un nodo ad un altro in un grafo pesato
 std::vector<int> dijkstra(const Grafo& la, int s, int w, std::vector<double>& dist, std::vector<int>& pred) {
-    int n = static_cast<int>(la.size());
+    // determino n, ovvero il numero di nodi
+	int n = static_cast<int>(la.size());
+	
+	// ridimensiono i vettori dist e pred
     pred.resize(n);
     dist.resize(n);
-
+	
+	// inizializzo i nodi con distanza infinita e senza alcun predecessore
     for (int i = 0; i < n; i++) {
         pred[i] = -1;
         dist[i] = std::numeric_limits<double>::infinity();
     }
+	
+	// il nodo s ha distanza 0 e sè stesso come predecessore
     pred[s] = s;
     dist[s] = 0;
-
+	
     using Nodo = std::pair<double, int>;
+	// PQ è una coda con priorità
     std::priority_queue<Nodo, std::vector<Nodo>, std::greater<Nodo>> PQ;
-
+	
+	// ogni nodo è inserito nella coda con la sua distanza attuale
     for (int i = 0; i < n; i++) {
         PQ.push({dist[i], i});
     }
-
+	
+	// inizializzo il vettore dei visitati per non riesaminare un nodo già ottimizzato
     std::vector<bool> visitato(n, false);
-
+	
+	// il ciclo a seguire estrae il nodo u con distanza d minima dalla coda
     while (!PQ.empty()) {
         auto [d, u] = PQ.top();
         PQ.pop();
-
+		
+		// se il nodo è già stato visitato lo ignora 
         if (visitato[u]) continue; 
         visitato[u] = true;
-
+		
+		// una volta ragiunto l'obiettivo si arresta
         if (u == w) break; 
-
+		
+		// scorre ogni vicino del nodo corrente
+		// se passando da u av trova un cammino più corto:
+		// aggiorno la distanza, salvo u come predecessore e reinserisco vicino in coda con la nuova distanza trovata
         for (const auto& [vicino, peso] : la[u]) {
             if (dist[vicino] > dist[u] + peso) {
                 dist[vicino] = dist[u] + peso;
@@ -1527,6 +1597,8 @@ std::vector<int> dijkstra(const Grafo& la, int s, int w, std::vector<double>& di
         }
     }
 	
+	// controllo se il nodo w sia raggiungibile
+	// se lo è: restituisco il cammino minimo da w ad s ed inverto il vettore in modo da avere l'ordine corretto
     std::vector<int> cammino;
     if (dist[w] < std::numeric_limits<double>::infinity()) {
         for (int cur = w; cur != s; cur = pred[cur]) {
@@ -1538,44 +1610,57 @@ std::vector<int> dijkstra(const Grafo& la, int s, int w, std::vector<double>& di
     return cammino;
 }
 
+// Funzionee trova cammino minimo
+// Si occupa di trovare il cammino minimo tra due vertici della nostra mesh
 void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
     int n = mesh.Cell0DsCoordinates.cols();
+	
+	// faccio un controllo sugli id per assicurarmi che rientrino nei limiti
 	if (id1 < 0 || id1 >= n || id2 < 0 || id2 >= n) {
         cout << "Valore di id1 o id2 non valido" << endl;
         return;
     }
+	
+	// copio le coordinate dei vertici della mesh in un vettore coords
     vector<Eigen::Vector3d> coords(n);
     for (int i = 0; i < n; i++)
         coords[i] = mesh.Cell0DsCoordinates.col(i);
-
-    Grafo grafo = costruisci_grafo_pesato(n, mesh.Cell1DsExtrema, coords);
-
-    vector<double> dist;
-    vector<int> pred;
-    vector<int> cammino = dijkstra(grafo, id1, id2, dist, pred);
 	
-	mesh.Cell0DsShortPath.resize(n, 0);
-	mesh.Cell1DsShortPath.resize(mesh.Cell1DsExtrema.cols(), 0);
-
+	// chiamo la funzione costruisci grafo pesato per creare un grafo a partire dai lati della mesh e dalle coordinate dei vertici
+    Grafo grafo = costruisci_grafo_pesato(n, mesh.Cell1DsExtrema, coords);
+	
+	// applico la funzione dijkstra per trovare il cammino più breve tra i due vertici
+    vector<double> dist; // distanza minima da id1
+    vector<int> pred; // predecessori per ricostruire il cammino
+    vector<int> cammino = dijkstra(grafo, id1, id2, dist, pred); // vettore di vertici incontrati lungo il percorso minimo
+	
+	// preparo due vettori booleani per evidenziare il cammino
+	mesh.Cell0DsShortPath.resize(n, 0); // evidenzia i vertici lungo il cammino
+	mesh.Cell1DsShortPath.resize(mesh.Cell1DsExtrema.cols(), 0); // evidenzia i lati lungo il cammino
+	
+	// verifico che sia stato trovato un cammino, cioè che il corrispettivo vettore non sia vuoto
     if (cammino.empty()) {
         cout << "Nessun cammino trovato tra " << id1 << " e " << id2 << endl;
         return;
     }
-
+	
+	// marco tutti i vertici lungo il cammino con 1
     for (int v : cammino) {
         mesh.Cell0DsShortPath[v] = 1;
     }
-
+	
     int num_archi = 0;
     double lunghezza_totale = 0.0;
 	
 	for (Eigen::Index i = 0; i + 1 < cammino.size();i++) {
 		int u = cammino[i];
 		int v = cammino[i + 1];
-
+		
+		// per ogni coppia di vertici consecutivi cerco l'indice del lato nella mesh
 		for (Eigen::Index j = 0; j < mesh.Cell1DsExtrema.cols();j++) {
 			int a = mesh.Cell1DsExtrema(0, j);
 			int b = mesh.Cell1DsExtrema(1, j);
+			// se lo trovo lo marco con 1, aggiungo la distanza euclidea al totale e incremento il numero di lati
 			if ((a == u && b == v) || (a == v && b == u)) {
 				mesh.Cell1DsShortPath[j] = 1;
 				lunghezza_totale += distanza(mesh.Cell0DsCoordinates.col(a), mesh.Cell0DsCoordinates.col(b));
