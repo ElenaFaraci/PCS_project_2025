@@ -311,7 +311,15 @@ bool valorizza_poliedro(int q, PolygonalMesh& mesh){
 	return true;
 	
 }
-
+bool converti_uns_int(const char* str, unsigned int& numero_conv){
+	istringstream iss(str);
+	int temp;
+    if ((iss >> temp) && iss.eof() && temp >= 0) {
+        numero_conv = static_cast<unsigned int>(temp);
+        return true;
+    }
+    return false;
+}
 
 
 bool controllo_lati_vertici (const PolygonalMesh& mesh){
