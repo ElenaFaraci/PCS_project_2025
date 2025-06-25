@@ -527,7 +527,7 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
 	tri_lati_facce(mesh, b, num_facc_pre);
 	
-	// --> TODO alla fine aggiorno il num facce tutto della mesh
+	
 	return true;
 }
 
@@ -628,7 +628,6 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 	// siginificato del conto sopra: b*(b+1)/2 = b + (b-1) + (b-2) + ... che è il numero di lati creati salendo 
 	// di piano in piano, moltiplico per 3: i tre lati del triangolo originale sono le direzioni dei piani
 	// moltiplico per num_facc_pre. tolgo i lati creati sugli spiagoli del solido originale, che ho contato 2 vote
-	
 	mesh.Cell2DsEdges = {};
 	mesh.Cell2DsEdges.reserve(mesh.Cell2DsVertices.size());
 	

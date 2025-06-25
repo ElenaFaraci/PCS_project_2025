@@ -12,7 +12,7 @@ list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_CostruisciDualeMes
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_proiezione_sfera.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_trova_cammino.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_controllo_lati_vertici.hpp)
-
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/test_converti_uns_int.hpp)
 
 
 

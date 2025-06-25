@@ -141,15 +141,22 @@ namespace PolygonalLibrary {
 	mesh.Cell3DsNumVert=k;
 	mesh.Cell3DsVertices.resize(k);
 	iota(mesh.Cell3DsVertices.begin(), mesh.Cell3DsVertices.end(), 0);
-	//cout<<mesh.Cell1DsId.size()<<endl; -->6
+	
+	//di seguito andrò a creare le nuove facce e lati
+	
 	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
-	//cout<<mesh.Cell1DsId.size()<<endl; -->6
-	//////////////////////////////////////////////////////////////////////////////////////////
-	// mi fermo qui con la copia della funzione
-	//cout<<mesh.NumCell1Ds<<endl; -->6
+	
 	tri_lati_facce(mesh, b, num_facc_pre);
+	
+	//////////////////////////////////////////////////////////////////////////////////////////
+	info_mesh(mesh);
+	//cout<< num_facc_pre<<endl;
+	
+	// mi fermo qui con la copia della funzione
+/*
+	
 	cout<<mesh.Cell1DsId.size()<<endl; //--> 2
-	//info_mesh(mesh);
+
 	// test: il numero di facce è coerente
 	ASSERT_EQ(mesh.Cell2DsEdges.size(), mesh.Cell2DsVertices.size() );
 	
@@ -185,7 +192,7 @@ namespace PolygonalLibrary {
 		}
 	}
 	
-	
+	*/
 	
 }
 
