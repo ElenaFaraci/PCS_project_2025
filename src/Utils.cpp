@@ -10,16 +10,6 @@
 #include <unordered_set>
 #include "UCDUtilities.hpp"
 
-/*
-SCALETTA:
-main, cmake, gitignore, finire poliedri (questa settimana)
-triangolazione
-duale proiezione
-punto 2
-*/
-
-
-
 
 namespace PolygonalLibrary
 {
@@ -27,13 +17,16 @@ namespace PolygonalLibrary
 	
 	
 	
-// TODO controllo su p, dentro la finzione o fuori?
+// la seguente funzione valorizza i tre possibili solidi platonici, con vertici sulla sfera
+// unitaria. Abbiamo ottenuto i punti calcolandoli a mano, inoltre abbiamo ordinato i lati
+// e i vertici delle facce in maniera opportuna, come da consegna
 bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 	
+	// q=3: tetraedro
 	if (q==3){
 		//Cell0Ds
 		mesh.NumCell0Ds=4;
-		mesh.Cell0DsId = {0,1,2,3}; // è efficiente? reserve?
+		mesh.Cell0DsId = {0,1,2,3}; 
 		mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
 		
 		mesh.Cell0DsCoordinates.col(0) << 1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3);
@@ -43,7 +36,7 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 
 		//Cell1Ds
 		mesh.NumCell1Ds=6;
-		mesh.Cell1DsId = {0,1,2,3,4,5}; // è efficiente? reserve? Vanno ordinati?
+		mesh.Cell1DsId = {0,1,2,3,4,5}; 
 		
 		mesh.Cell1DsExtrema = Eigen::MatrixXi(2, mesh.NumCell1Ds);
 		mesh.Cell1DsExtrema.col(0) << 0, 1 ;
@@ -60,7 +53,7 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 		mesh.Cell2DsNumEdg = {3, 3, 3, 3};
 		
 		
-		mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); // serve davvero?
+		mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); 
 		
 		vector<unsigned int> v1 = {0,1,2};
 		vector<unsigned int> v2 = {1,2,3};
@@ -79,23 +72,23 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 		mesh.Cell2DsEdges = {e1, e2, e3, e4};
 		
 		//Cell3Ds
-		mesh.Cell3DsId=0; //caso tetraedro
+		mesh.Cell3DsId=0; 
 		
 		mesh.Cell3DsNumVert = mesh.NumCell0Ds;
 		mesh.Cell3DsNumEdg = mesh.NumCell1Ds;
 		mesh.Cell3DsNumFaces = mesh.NumCell2Ds;
 		
-		mesh.Cell3DsVertices = mesh.Cell0DsId; //costruttore di copia? 
+		mesh.Cell3DsVertices = mesh.Cell0DsId; 
 		mesh.Cell3DsEdges = mesh.Cell1DsId;
 		mesh.Cell3DsFaces = mesh.Cell2DsId;
 		
 		
 		}
-
+	// q=4: ottaedro
 	else if (q==4){
 		//Cell0Ds
 		mesh.NumCell0Ds=6;
-		mesh.Cell0DsId = {0,1,2,3,4,5}; // è efficiente? reserve?
+		mesh.Cell0DsId = {0,1,2,3,4,5}; 
 		mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
 		
 		mesh.Cell0DsCoordinates.col(0) << 0.0, 0.0, 1.0;
@@ -107,7 +100,7 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 		
 		//Cell1Ds
 		mesh.NumCell1Ds=12;
-		mesh.Cell1DsId = {0,1,2,3,4,5,6,7,8,9,10,11}; // è efficiente? reserve? Vanno ordinati?
+		mesh.Cell1DsId = {0,1,2,3,4,5,6,7,8,9,10,11}; 
 		
 		mesh.Cell1DsExtrema = Eigen::MatrixXi(2, mesh.NumCell1Ds);
 		mesh.Cell1DsExtrema.col(0) << 0, 1;
@@ -130,7 +123,7 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 		mesh.Cell2DsNumEdg = {3, 3, 3, 3, 3, 3, 3, 3};
 		
 		
-		mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); // serve davvero?
+		mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); 
 		
 		vector<unsigned int> v1 = {0,1,2};
 		vector<unsigned int> v2 = {0,2,3};
@@ -170,11 +163,11 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 		}
 		
 		
-		
+	// q=5: icosaedro
 	else if (q==5){
 		//Cell0Ds
 		mesh.NumCell0Ds=12;
-		mesh.Cell0DsId = {0,1,2,3,4,5,6,7,8,9,10,11}; // è efficiente? reserve?
+		mesh.Cell0DsId = {0,1,2,3,4,5,6,7,8,9,10,11}; 
 		mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
 		
 		double phi = (1+sqrt(5))/2;
@@ -240,7 +233,7 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 		mesh.Cell2DsNumEdg = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 		
 		
-		mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); // serve davvero?
+		mesh.Cell2DsVertices.reserve(mesh.NumCell2Ds); 
 		
 		vector<unsigned int> v1 = {0,4,8};
 		vector<unsigned int> v2 = {0,2,4};
@@ -312,6 +305,10 @@ bool valorizza_poliedro(unsigned int q, PolygonalMesh& mesh){
 	return true;
 	
 }
+
+// la funzione seguente, preso in input un puntatore ad un char (caso di argv) 
+// ed un unsigned int ritorna vero e salva il numero se è convertibile
+// altrimenti ritorna falso
 bool converti_uns_int(const char* str, unsigned int& numero_conv){
 	istringstream iss(str);
 	int temp;
@@ -322,7 +319,9 @@ bool converti_uns_int(const char* str, unsigned int& numero_conv){
     return false;
 }
 
-
+// La seguente funzione controlla che due lati consecutivi in una stessa 
+// faccia abbiano un vertice in comune e che il j-esimo vertice di una faccia sia 
+// contenuto nel j-esimo lato.
 bool controllo_lati_vertici (const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
 		
@@ -368,19 +367,14 @@ bool controllo_lati_vertici (const PolygonalMesh& mesh){
 	}
 	return true;
 }
-/////////////////////////////////////////////////////////////////////////////////////////
-// Prove triangolazione
-string ArrayToString(const size_t& n, const double* const& v)
-{
-    string str;
-    ostringstream toString;
-    toString << "[ ";
-    for (unsigned int i = 0; i < n; i++)
-        toString<< v[i]<< " ";
-    toString << "]";
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+//              PRIMA TRIANGOLAZIONE
 
-    return toString.str();
-}
+
+// dati due vertici calcola un nuovo vertice con la formula:
+// new_vertex = (vertex2 - vertex1) * step/b + vertex1
+// se ad esempio step =1 e b = 2, calcola il punto medio
 Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b, unsigned int step, const PolygonalMesh& mesh){
 	Eigen::Vector3d vertex1 = mesh.Cell0DsCoordinates.col(id1);
 	Eigen::Vector3d vertex2 = mesh.Cell0DsCoordinates.col(id2);
@@ -394,7 +388,10 @@ Eigen::VectorXd Nuovo_Vertice(unsigned int id1, unsigned int id2, unsigned int b
     return new_vertex;
 }
 
-
+// Data la mesh, le coordinate di un punto e il numero di punti presenti 
+// nella mesh, ritorna -1, se le coordinate passate alla funzione non 
+// coincidono con nessun punto già presente. Altrimenti, ritorna l'id del punto 
+// coincidente con quelle coordinate
 int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsigned int k) {				   
 	double epsilon = 1e-10;
     for (int i = 0; i < k; ++i) {
@@ -406,10 +403,15 @@ int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsign
 }
 
 
-
+// Triangolazione: Iterando sulle facce e sui "piani" di ogni faccia,
+// crea i vertici della triangolazione e li aggiunge a Cell0DsCoordinates.
+// Inoltre, crea un vettore punti_faccia che contiene gli ID dei vertici 
+// di ogni faccia, una dopo l'altra, srotolati per piano. 
+// Per completare la triangolazione, chiama altre due funzioni: 
+// tri_vertici_facce e tri_lati_facce
 bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigned int q){
-	unsigned int T = b*b+b*c+c*c;
-	unsigned int V = 0;
+	unsigned int T = b*b+b*c+c*c; // formula fornita dal testo
+	unsigned int V = 0; // sarà il numero di vertici
 	if (q==3){
 		V=2*T+2;
 	} else if (q==4){
@@ -437,6 +439,7 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 	// iterazione sulle facce
 	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
 		
+		// i vertici della faccia "grande" o originale
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
 		unsigned int z0 = mesh.Cell2DsVertices[j][2];
@@ -532,7 +535,10 @@ bool Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigne
 	return true;
 }
 
-void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_faccia,
+//Sfrutto il vettore punti_faccia, andando a considerare due piani alla volta, 
+//e creando i triangoli tra di essi. Aggiungo dunque questi a Cell2DsVertices
+
+void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, const vector<int>& punti_faccia,
 					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia){
 	
 	//creo le nuove facce, perciò mi dimentico di quelle vecchie	
@@ -605,8 +611,9 @@ void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, vector<int> punti_fa
 	
 }
 
-
-int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh) {
+//Dati due id di punti, se sono già gli estremi di un lato, ritorna l'id del lato,
+// altrimenti -1
+int esiste_gia_1D(unsigned int point_1, unsigned int point_2, const PolygonalMesh& mesh) {
     
 	int p1 = min(point_1, point_2);
     int p2 = max(point_1, point_2);
@@ -622,7 +629,9 @@ int esiste_gia_1D(int point_1, int point_2, const PolygonalMesh& mesh) {
     return -1; 
 }
 
-
+// Usando i vertici delle facce già create nella funzione precedente,
+// andiamo a ciclare su questi vertici di ogni faccia per creare i nuovi lati.
+// I lati vengono creati in modo ordinato rispettando la consecutività.
 void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre){
 	
 	unsigned int num_lati=num_facc_pre*3*b*(b+1)/2 -b*mesh.NumCell1Ds; 
@@ -652,7 +661,6 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 				mesh.Cell1DsId.push_back(k);
 				v.push_back(k);
 				k++;
-				// ma devo aggiungere anche gli id dei lati
 			} else{
 				// il lato esiste già 
 				v.push_back(id_l);
@@ -673,6 +681,7 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
+//          TRIANGOLAZIONE 2
 bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	
 	unsigned int num_facc;
@@ -1041,8 +1050,6 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 
 
 
-
-
 // Proiezione su sfera unitaria e controllo:
 // normalizza tutti i vertici della mesh per proiettarli su una sfera unitaria
 void proiezione_su_sfera_unitaria(PolygonalMesh& mesh) {
@@ -1159,6 +1166,10 @@ void info_mesh(const PolygonalMesh& mesh){
     cout << "==========================\n";
 
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//                        SALVATAGGIO TXT
 // Funzioni di salvataggio e stampa celle in txt
 // Cella 0D
 // Questa funzione salva e stampa i vertici del nostro poliedro
@@ -1272,6 +1283,9 @@ void salvataggio_Cell3Ds(const PolygonalMesh& mesh, const std::string& filename)
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//               FUNZIONE DUALE
 
 // funzione baricentro
 // questa funzione calcola il baricentro di un insieme di vertici all’interno della mesh
@@ -1308,7 +1322,8 @@ vector<vector<unsigned int>> trova_facce_per_vertice(const PolygonalMesh& mesh) 
     return facce_per_vertice;
 }
 
-
+//Date le facce vicine a un vertice v, l'obiettivo della funzione è ordinarle 
+//in modo ciclico attorno ad esso.
 vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned int v,
 										  const vector<unsigned int>& facce_vicinato_v){
 	
@@ -1382,8 +1397,6 @@ vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned in
 	
 }
 
-
-//funzione duale
 
 
 PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
