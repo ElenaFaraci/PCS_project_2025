@@ -1,0 +1,65 @@
+@startuml
+title Cammino Minimo
+
+start
+
+:trova_cammino_minimo(mesh, id1, id2);
+
+note right
+Funzione principale che calcola
+il cammino minimo tra due vertici
+di una mesh poligonale.
+end note
+
+:Controllo validità degli id;
+note right
+Verifica che id1 e id2 siano compresi
+nell'intervallo [0, NumCell0Ds).
+end note
+
+:Estrazione coordinate vertici;
+
+:costruisci_grafo_pesato(n, Cell1DsExtrema, coords);
+note right
+Costruisce lista di adiacenza pesata:
+- Ogni lato è un arco
+- Peso = distanza euclidea tra vertici
+end note
+
+:dijkstra(grafo, id1, id2, dist, pred);
+note left
+Algoritmo di Dijkstra:
+- Calcola distanze minime
+- Restituisce vettore del cammino
+end note
+
+if (cammino vuoto?) then (sì)
+  :Stampa "nessun cammino trovato";
+  stop
+else (no)
+  :Inizializzazione:
+  - Cell0DsShortPath a 0
+  - Cell1DsShortPath a 0;
+
+  :Aggiorna Cell0DsShortPath;
+  note right
+  Segna come 1 i vertici attraversati
+  dal cammino minimo.
+  end note
+
+  :Conta archi + somma lunghezze;
+  :Aggiorna Cell1DsShortPath;
+  note right
+  Per ogni coppia (u,v) nel cammino:
+  - trova lato corrispondente
+  - aggiorna Cell1DsShortPath
+  end note
+
+  :Stampa info su cammino:
+  - Vertici
+  - Lunghezza
+  - Numero archi;
+endif
+
+stop
+@enduml

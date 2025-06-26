@@ -1,0 +1,44 @@
+@startuml
+
+title Main
+
+start
+  :Leggi input da terminale (p, q, b, c, id1, id2);
+  :Controlla validità valori;
+  if (Input valido?) then (yes)
+    :Imposta flag cammino se id1 e id2 presenti;
+  else (no)
+    :Errore e termina;
+    stop
+  endif
+
+  if (p == 3 o q == 3) then (yes)
+    :Costruisci poliedro mesh;
+    if (q == 3) then (yes)
+      :Imposta flag_duale = true;
+  else (no)
+    :Errore e termina;
+    stop
+  endif
+
+  :Esegui triangolazione se richiesto;
+
+  if (flag_duale) then (yes)
+    :Costruisci mesh duale;
+    :Proietta duale su sfera unitaria;
+  else (no)
+    :Proietta mesh su sfera unitaria;
+  endif
+
+  if (flag_cammino) then (yes)
+    :Calcola cammino minimo;
+    :Esporta mesh con cammino;
+  else (no)
+    :Esporta mesh senza cammino;
+  endif
+
+  :Salva mesh su file esterni;
+
+stop
+
+@enduml
