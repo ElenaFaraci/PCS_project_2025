@@ -8,6 +8,7 @@
 #include <numeric>
 #include <queue>
 #include <unordered_set>
+#include "UCDUtilities.hpp"
 
 /*
 SCALETTA:
@@ -1676,14 +1677,55 @@ void trova_cammino_minimo(PolygonalMesh& mesh, int id1, int id2) {
 }
 
 
+void stampa_para_cammino(PolygonalMesh& mesh){
+		Gedim::UCDUtilities utilities;
+		{
+		vector<Gedim::UCDProperty<double>> cell0Ds_properties(1);
+
+		cell0Ds_properties[0].Label = "ShortPathVertici";
+		cell0Ds_properties[0].UnitLabel = "-";
+		cell0Ds_properties[0].NumComponents = 1;
+
+		vector<double> ShortPath_v(mesh.NumCell0Ds, 0.0);
+		for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i) {
+			ShortPath_v[i] = static_cast<double>(mesh.Cell0DsShortPath[i]);
+		}
+
+		cell0Ds_properties[0].Data = ShortPath_v.data();
+
+		utilities.ExportPoints("./Cell0Ds_cammino.inp",
+							   mesh.Cell0DsCoordinates,
+							   cell0Ds_properties);
+		}
+			
+		{
+		std::vector<Gedim::UCDProperty<double>> cell1Ds_properties(1);
+
+		cell1Ds_properties[0].Label = "ShortPathLati";
+		cell1Ds_properties[0].UnitLabel = "-";
+		cell1Ds_properties[0].NumComponents = 1;
+
+		std::vector<double> ShortPath_e(mesh.NumCell1Ds,0.0);
+		for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i)
+			ShortPath_e[i] = static_cast<double>(mesh.Cell1DsShortPath[i]);
+		cell1Ds_properties[0].Data = ShortPath_e.data();
+
+		
+
+
+
+		utilities.ExportSegments("./Cell1Ds_cammino.inp",
+								mesh.Cell0DsCoordinates,
+								mesh.Cell1DsExtrema,
+								{},
+								cell1Ds_properties);
+		}
+}
+
+
 
 	
 
 }
-/* TO DO: 1)lati e facce della triangolazione;
-          2)affinare il duale;
-		  3)creare funzione che stampi i file;
-		  4)meanwhile iniziare scrittura di qualche google test, ad esempio nel calcolo del baricentro, esiste già, vertici della triangolazione, etc...;
-		  
-*/
+
 

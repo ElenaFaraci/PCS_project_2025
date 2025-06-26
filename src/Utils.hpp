@@ -78,5 +78,7 @@ vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned in
 
 bool converti_uns_int(const char* str, unsigned int& out);
 
+void stampa_para_cammino(PolygonalMesh& mesh);
+
 }
 
