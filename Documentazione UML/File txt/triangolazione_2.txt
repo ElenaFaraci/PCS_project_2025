@@ -1,0 +1,68 @@
+@startuml
+start
+:Valori in input: p, q, b;
+fork
+  :Creo il poliedro (p, q);
+  :Per ogni lato, salvo i vertici di mesh_2 attraverso
+  la funzione Nuovo_Vertice(id1, id2, step, &mesh);
+fork again
+  :Creo mesh (p, q, b, 0);
+  :Itero sulle facce e salvo i baricentri in una matrice,
+   uso la funzione baricentro(&vertici, &mesh);
+fork again
+  :Inizializzo mesh_2, che conterrà
+      la seconda triangolazione;
+
+end merge
+  :i=0;
+  repeat:Considero la faccia i-esima del poliedro;
+  :Creo un vettore di zeri che conterrà gli id dei baricentri (eventualmente ripetuti) delle facce j
+ per cui non esiste il punto medio di una o più coppie di vertici;
+  :Creo una matrice di zeri che conterrà le coordinate dei vertici
+                            per cui non esiste il punto medio;
+  :j=0;
+  repeat :Considero il triangolino j di mesh che appartiene alla faccia i;
+  :Salvo i tre vertici del triangolo j in mesh_2;
+  :Salvo i lati che i vertici formano con il baricentro j;
+  :Calcolo le coordinate dei 3 punti medi dei lati di j, li chiamo m_k (k = 1, 2, 3);
+if (mk esiste nella matrice matr_vert_lati?) then (yes)
+  :Salvo m_k in mesh_2;
+  :Salvo i lati che m_k forma con i due vertici del lato a cui appartiene;
+  :Salvo il lato che si forma tra m_k e il baricentro j-esimo;
+  :Salvo le due facce formate da m_k, il baricentro, e i vertici;
+else (no)
+  :Salvo l'id del baricentro j-esimo nel vettore dei baricentri;
+  :Salvo i vertici che formano m_k nella tabella;
+endif
+
+
+backward:j ++;
+repeat while (j<b^2?) is (yes)
+->no;
+:Creo un vettore di zeri della stessa dimensione di baricentri_faccia_grande, lo chiamo indici_visitati;
+:i_=0;
+repeat :Considero l'i_-esimo elemento di indici_visitati;
+if (indici_visitati[i_] == 0) then (yes)
+  :j_ = 1;
+if (indici_visitati[j_] == 0) then (yes)
+  if (Le colonne i_ e j_ della tabella contengono gli stessi vertici) then (yes)
+  :Salvo i lati che i vertici formano con i baricentri;
+  :Salvo le due facce formate dal lato tra i baricentri e i due vertici;
+else (no)
+ : j_++;
+endif
+else (no)
+ : j_++;
+endif
+else (no)
+ : i_++;
+endif
+backward:i_++;
+repeat while (i_ < indici_visitati.size()?) is (yes)
+
+->no;
+repeat while (i < numero di facce di poliedro?) is (yes)
+->no;
+
+end
+@enduml

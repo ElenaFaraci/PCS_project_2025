@@ -1,0 +1,46 @@
+@startuml
+
+set separator ::
+class PolygonalLibrary::PolygonalMesh {
++ Cell0Ds
+
+unsigned int NumCell0Ds
+std::vector<unsigned int> Cell0DsId
+
+Eigen::MatrixXd Cell0DsCoordinates
+..
++ Cell1Ds
+
+unsigned int NumCell1Ds
+std::vector<unsigned int> Cell1DsId
+
+Eigen::MatrixXi Cell1DsExtrema
+..
++ Cell2Ds
+unsigned int NumCell2Ds
+std::vector<unsigned int> Cell2DsId
+
+std::vector<unsigned int> Cell2DsNumVert
+std::vector<unsigned int> Cell2DsNumEdg
+
+std::vector<vector<unsigned int>> Cell2DsVertices
+std::vector<vector<unsigned int>> Cell2DsEdges
+..
++ Cell3Ds
+unsigned int NumCell3Ds
+std::vector<unsigned int> Cell3DsId
+
+unsigned int Cell3DsNumVert
+unsigned int Cell3DsNumEdg
+unsigned int Cell3DsNumFaces
+
+vector<unsigned int> Cell3DsVertices
+vector<unsigned int> Cell3DsEdges
+vector<unsigned int> Cell3DsFaces
+..
++CellShortPath
+std::vector<int> Cell0DsShortPath
+std::vector<int> Cell1DsShortPath
+}
+
+@enduml
