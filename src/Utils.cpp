@@ -1398,7 +1398,8 @@ vector<unsigned int> giro_attorno_vertice(const PolygonalMesh& mesh, unsigned in
 }
 
 
-
+// creo il duale: il ruolo delle facce di mesh diventa quello di vertici del duale
+//                il ruolo dei vertici di mesh diventa quello di facce del duale
 PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
     PolygonalMesh duale;
 
@@ -1415,6 +1416,9 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 	
 	// trovo i lati del duale, posso connettere due baricentri, solo se 
 	// le due facce che li generano sono adiacenti, cioè hanno un lato in comune
+	// sfrutto il fatto che ho salvato i baricentri con lo stesso ordine di salvataggio 
+	// delle facce nella mesh originale, allora se due facce sono adiacenti, i due 
+	// baricentri saranno connessi con un lato
     unsigned int max_connessioni = num_facce * (num_facce - 1) / 2;
 	duale.Cell1DsExtrema.resize(2,max_connessioni);
 
@@ -1447,6 +1451,8 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 				// OSS: grazie al fatto che j>i, potrò in seguito usare la funzione esiste_gia_1Dgià
                 duale.Cell1DsExtrema.col(count) << i, j;
                 count++;
+				// i e j sono gli id delle vecchie facce, ma ora assumono il nuovo 
+				// siginificato di id dei baricentri da connettere con il lato
             }
         }
     }
@@ -1471,7 +1477,10 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 		// facce che contengono il vertice v di mesh
         vector<unsigned int> facce = facce_per_vertice[v];
         vector<unsigned int> facce_ordinate = giro_attorno_vertice(mesh, v, facce);
-
+		// ordino ciclicamente le facce... perché? 
+		// Perché uso le proprietà della vecchia mesh per ordinarle ciclicamente
+		// e poi grazie all'identificazione tra vecchie facce e nuovi vertici
+		// otterrò delle facce nuove che rispettano la consecutività
         duale.Cell2DsVertices[v] = facce_ordinate;
         duale.Cell2DsId[v] = v;
 		duale.Cell2DsNumVert.push_back(facce_ordinate.size());
@@ -1492,7 +1501,7 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
 			unsigned int point_1 = duale.Cell2DsVertices[j][i];
 			unsigned int point_2 = duale.Cell2DsVertices[j][(i+1)%(duale.Cell2DsNumEdg[j])];
 			
-			//OSS: posso usare esiste già perchè ho creato i lati con id della coppia crescente
+			//OSS: posso usare esiste già 1D
 			int id_l=esiste_gia_1D(point_1, point_2, duale);
 			if (id_l==-1){
 				// il lato è nuovo --> problema, li avevamo gia tutti
@@ -1521,7 +1530,9 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh) {
     return duale;
 	
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+//               CAMMINO MINIMO
 
 
 double distanza(const Vector3d& p1, const Vector3d& p2) {
