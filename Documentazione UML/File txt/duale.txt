@@ -20,12 +20,16 @@ backward:i++;
 repeat while (i < num_facce?) is (yes)
 -> no;
 :Passo ora a costruire le facce del duale;
-:Attraverso la funzione trova_facce_per_vertice(mesh) trovo nella
-colonna v tutte le facce che contengono il vertice v (v appartiene a mesh);
+:Attraverso la funzione trova_facce_per_vertice(mesh) creo un
+vector<vector<unsigned int>>, in cui il v-esimo vettore contiene
+le facce di mesh che contengono v;
+note right
+v vertice di mesh
+end note
 :Itero sui vertici v di mesh e, attraverso la funzione giro_attorno_vertice
 ordino ciclicamente le facce adiacenti a v(che diventeranno vertici in duale);
 :Salvo le nuove facce in duale;
-:Aggiorno le celle 3d di duale;
+:Aggiorno le celle 3D di duale;
 
 end
 @enduml

@@ -12,17 +12,33 @@ start
     stop
   endif
 
-  if (p == 3 o q == 3) then (yes)
-    :Costruisci poliedro mesh;
-    if (q == 3) then (yes)
-      :Imposta flag_duale = true;
-  else (no)
-    :Errore e termina;
-    stop
-  endif
+if (p==3) then (yes)
+'space label only for alignment
+label sp_lab0
+label sp_lab1
+'real label
+label lab
+:Valorizza poliedro;
+else (no)
+if (q == 3) then (yes)
+:Flag duale = true;
+label sp_lab2
+goto sp_lab1
+else
+:Errore;
+stop
+endif
+endif
+if (b, c non validi) then (yes)
+:Errore;
+stop
+else(no)
 
   :Esegui triangolazione se richiesto;
-
+note right
+In base agli indici (b, c) viene
+scelta la triangolazione opportuna
+end note
   if (flag_duale) then (yes)
     :Costruisci mesh duale;
     :Proietta duale su sfera unitaria;
@@ -42,3 +58,4 @@ start
 stop
 
 @enduml
+

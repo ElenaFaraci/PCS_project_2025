@@ -4,7 +4,7 @@ start
 :Inizzializzazione vettore punti_faccia;
  note right
 n = n°(facce originali)* n°(nuovi vertici per faccia)
-vector<int> punti_faccia
+vector<unsigned int> punti_faccia
 punti_faccia.reserve(n)
    end note
 
@@ -37,7 +37,7 @@ repeat while (ho passato tutte le facce?) is (no)
 ->yes;
 : chiamo la funzione per i vertici delle faccie;
 note right
-void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, const vector<int>& punti_faccia,
+void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, const vector<unsigned int>& punti_faccia,
 					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia)
 end note
 : chiamo la funzione per i lati delle faccie;
