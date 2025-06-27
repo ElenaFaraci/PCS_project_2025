@@ -1,0 +1,26 @@
+@startuml
+start
+:tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre);
+:Inizializzazione di Cell1DsId, Cell2DsEdges;
+  repeat :Ad ogni iterazione considero una faccia della mesh (sono già presenti le facce della triangolazione);
+ repeat :Ad ogni iterazione considero una coppia di vertici della faccia;
+if (Il lato definito dalla coppia è nuovo nella mesh?) then (yes)
+note right
+int esiste_gia_1D(unsigned int point_1, 
+unsigned int point_2, const PolygonalMesh& mesh)
+end note
+  :aggingo il suo id e i suoi estremi alla mesh;
+else (no)
+endif
+repeat while (ho iterato su tutte le coppie di vertici?) is (no)
+->yes;
+:Salvo i lati in Cell2DsEdges;
+note left
+mesh.Cell2DsEdges.push_back(v)
+end note
+
+repeat while (ho finito le facce?) is (no)
+->yes;
+
+end
+@enduml
