@@ -1,0 +1,48 @@
+@startuml
+start
+:Triangolazione(PolygonalMesh& mesh, unsigned int b, unsigned int c, unsigned int q);
+:Inizzializzazione vettore punti_faccia;
+ note right
+n = n°(facce originali)* n°(nuovi vertici per faccia)
+vector<int> punti_faccia
+punti_faccia.reserve(n)
+   end note
+
+  repeat:ciclo sulle facce del poliedro (j);
+  :ricavo i vertici di questa faccia;
+
+  repeat :definisco un piano di lavoro, determinato da due punti base su due lati della faccia originale. Alla prima \niterazione i punti base saranno i primi due vertici della faccia (j), dopodiche ad ogni iterazione il piano "sale", \ngenerando nuovi punti base sui due lati dei punti base iniziali;
+ repeat :per ogni piano itero per creare i punti: se sono sul primo piano creo b+1 punti, sul secondo b, ecc...;
+
+if (Il vertice creato è nuovo nella mesh) then (yes)
+note right
+int Esiste_gia(PolygonalMesh& mesh,
+const Eigen::Vector3d& nuovo_vertice, unsigned int k)
+   end note
+  :aggingo il suo id e le sue coordinate alla mesh;
+  :aggiungo il suo id a punti_faccia;
+else (no)
+  :aggiungo il suo id a punti_faccia;
+endif
+
+repeat while (ho finito il piano) is (no)
+->yes;
+:creo inizio e fine del piano successivo, li aggingo alla mesh con lo stesso criterio di prima;
+repeat while (ho fatto tutti i piani della facia?) is (no)
+->yes;
+:aggingo a punti_faccia la sommità del triangolo originale;
+
+
+repeat while (ho passato tutte le facce?) is (no)
+->yes;
+: chiamo la funzione per i vertici delle faccie;
+note right
+void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, const vector<int>& punti_faccia,
+					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia)
+end note
+: chiamo la funzione per i lati delle faccie;
+note right
+void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pre)
+end note
+end
+@enduml
