@@ -1,0 +1,31 @@
+@startuml
+start
+:Valori in input: mesh;
+:Inizializzo la mesh 'duale';
+:Creo i vertici di duale, cioè i baricentri delle facce in mesh
+uso la funzione baricentro(&vertici, &mesh);
+:i=0;
+repeat:Prendo la faccia i da mesh;
+:j = i+1;
+repeat: Prendo la faccia j da mesh;
+if(Le facce i e j sono adiacenti?) then(yes)
+:Salvo il lato (i,j) nel duale
+(lato che connette i baricentri i e j);
+else (no)
+endif
+backward: ++j;
+repeat while (j < num_facce?) is (yes)
+-> no;
+backward:i++;
+repeat while (i < num_facce?) is (yes)
+-> no;
+:Passo ora a costruire le facce del duale;
+:Attraverso la funzione trova_facce_per_vertice(mesh) trovo nella
+colonna v tutte le facce che contengono il vertice v (v appartiene a mesh);
+:Itero sui vertici v di mesh e, attraverso la funzione giro_attorno_vertice
+ordino ciclicamente le facce adiacenti a v(che diventeranno vertici in duale);
+:Salvo le nuove facce in duale;
+:Aggiorno le celle 3d di duale;
+
+end
+@enduml
