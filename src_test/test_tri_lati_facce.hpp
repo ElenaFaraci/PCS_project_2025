@@ -26,9 +26,8 @@ namespace PolygonalLibrary {
 	ASSERT_TRUE(valorizza_poliedro(3, mesh));
 	
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Copia funzione triangolazione
-	unsigned int T = b*b+b*c+c*c;
-	unsigned int V = 0;
+	unsigned int T = b*b+b*c+c*c; // formula fornita dal testo
+	unsigned int V = 0; // sarà il numero di vertici
 	if (q==3){
 		V=2*T+2;
 	} else if (q==4){
@@ -56,6 +55,7 @@ namespace PolygonalLibrary {
 	// iterazione sulle facce
 	for(unsigned int j = 0; j < mesh.NumCell2Ds; j ++){
 		
+		// i vertici della faccia "grande" o originale
 		unsigned int x0 = mesh.Cell2DsVertices[j][0];
 		unsigned int y0 = mesh.Cell2DsVertices[j][1];
 		unsigned int z0 = mesh.Cell2DsVertices[j][2];
@@ -145,17 +145,15 @@ namespace PolygonalLibrary {
 	//di seguito andrò a creare le nuove facce e lati
 	
 	tri_vertici_facce(mesh, b, punti_faccia, num_facc_pre, num_nuovi_per_faccia);
-	
 	tri_lati_facce(mesh, b, num_facc_pre);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
-	info_mesh(mesh);
-	//cout<< num_facc_pre<<endl;
+	//info_mesh(mesh);
+
 	
 	// mi fermo qui con la copia della funzione
-/*
+
 	
-	cout<<mesh.Cell1DsId.size()<<endl; //--> 2
 
 	// test: il numero di facce è coerente
 	ASSERT_EQ(mesh.Cell2DsEdges.size(), mesh.Cell2DsVertices.size() );
@@ -192,7 +190,7 @@ namespace PolygonalLibrary {
 		}
 	}
 	
-	*/
+	
 	
 }
 

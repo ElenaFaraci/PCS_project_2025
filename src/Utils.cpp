@@ -641,8 +641,8 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 	mesh.Cell2DsEdges = {};
 	mesh.Cell2DsEdges.reserve(mesh.Cell2DsVertices.size());
 	
-	mesh.Cell1DsId ={};
-	mesh.Cell1DsId.reserve(num_lati);
+	
+	
 	
 	mesh.Cell1DsExtrema.resize(2, num_lati);
 	unsigned int k=0;
@@ -658,7 +658,7 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 				// il lato è nuovo
 				Vector2i new_l(point_1,point_2);
 				mesh.Cell1DsExtrema.col(k)=new_l;
-				mesh.Cell1DsId.push_back(k);
+				//mesh.Cell1DsId.push_back(k);
 				v.push_back(k);
 				k++;
 			} else{
@@ -668,6 +668,12 @@ void tri_lati_facce(PolygonalMesh& mesh, unsigned int b,unsigned int num_facc_pr
 			
 		}
 		mesh.Cell2DsEdges.push_back(v);
+	}
+	
+	mesh.Cell1DsId ={};
+	mesh.Cell1DsId.reserve(num_lati);
+	for(unsigned int i=0;i<num_lati;i++){
+		mesh.Cell1DsId.push_back(i);
 	}
 	
 	mesh.NumCell1Ds=num_lati;
@@ -703,7 +709,7 @@ bool triangolazione_2(PolygonalMesh& mesh_2, unsigned int b, unsigned int q){
 	if(!stato1){
 		cout<<"errore chiamata triangolazione in triangolazione_2"<<endl;
 	}
-	info_mesh(mesh_2);
+	
 	unsigned int numero_vert_su_lati = poliedro.NumCell0Ds + poliedro.NumCell1Ds*(2*b-1);
 	MatrixXd matr_vert_lati = MatrixXd::Zero(3,numero_vert_su_lati);
 	unsigned int count=0;
