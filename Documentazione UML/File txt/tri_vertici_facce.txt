@@ -1,0 +1,29 @@
+@startuml
+start
+:tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, const vector<int>& punti_faccia,\nunsigned int num_facc_pre, unsigned int num_nuovi_per_faccia);
+:Inizializzazione di Cell2DsId, Cell2DsVertices;
+  repeat :Ad ogni iterazione considero un numero "m" di elementi di punti_faccia pari al numero\ndi nuovi punti creati per ogni faccia del poliedro iniziale. Il prmo ciclo va dunque\ndalla posizione 0, alla posizione (m-1) del vettore punti_faccia;
+:Per ogni strato della faccia salvo la posizione di inizio dello strato;
+ repeat :Per ogni ciclo prendendo una coppia di strati;
+repeat: Per ogni coppia di strati indivduo due triangoli alla volta 
+note right
+unsigned int a  = punti_faccia[base_r + k];
+unsigned int b_ = punti_faccia[base_r + k + 1];
+unsigned int c  = punti_faccia[base_r1 + k];
+unsigned int d  = punti_faccia[base_r1 + k + 1];
+end note
+:Salvo i triangoli in Cell2DsVertices;
+note right
+mesh.Cell2DsVertices.push_back({a, b_, c})
+mesh.Cell2DsVertices.push_back({b_, d, c})
+end note
+
+repeat while (ho finito lo strato?) is (no)
+->yes;
+
+repeat while (ho finito la faccia?) is (no)
+->yes;
+repeat while (ho passato tutte le facce?) is (no)
+->yes;
+end
+@enduml
