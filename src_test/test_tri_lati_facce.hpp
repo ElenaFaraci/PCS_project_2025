@@ -46,7 +46,7 @@ namespace PolygonalLibrary {
 	//creo un vettore punti_faccia che contenga i vertici, nuovi e vecchi, di ciascuna faccia
 	unsigned int num_nuovi_per_faccia=((b+1)*(b+2))/2;
 	unsigned int n=num_nuovi_per_faccia*num_facc_pre;
-	vector<int> punti_faccia;
+	vector<unsigned int> punti_faccia;
 	punti_faccia.reserve(n);
 	
 	// resize della matrice che ospiterà anche i nuovi vertici

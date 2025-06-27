@@ -31,7 +31,7 @@ PolygonalMesh CostruisciDualeMesh(const PolygonalMesh& mesh);
 int Esiste_gia(PolygonalMesh& mesh, const Eigen::Vector3d& nuovo_vertice, unsigned int k);
 
 
-void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, const vector<int>& punti_faccia,
+void tri_vertici_facce(PolygonalMesh& mesh, unsigned int b, const vector<unsigned int>& punti_faccia,
 					   unsigned int num_facc_pre, unsigned int num_nuovi_per_faccia);
 
 int esiste_gia_1D(unsigned int point_1, unsigned int point_2, const PolygonalMesh& mesh);
