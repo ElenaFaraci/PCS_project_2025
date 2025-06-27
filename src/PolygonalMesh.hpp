@@ -11,54 +11,41 @@ namespace PolygonalLibrary {
 
 struct PolygonalMesh
 {
-	// Cell0D
-    unsigned int NumCell0Ds = 0; ///< number of Cell0D
-    std::vector<unsigned int> Cell0DsId = {}; ///< Cell0D id, size 1 x NumberCell0D
-    Eigen::MatrixXd Cell0DsCoordinates = {}; ///< Cell0D coordinates
-    // I marker servono?
-	// std::map<unsigned int, list<unsigned int>> MarkerCell0Ds = {}; ///< Cell0D markers
+	//Cell0D
+    unsigned int NumCell0Ds = 0; // numero vertici
+    std::vector<unsigned int> Cell0DsId = {}; // id dei vertici [1 x NumCell0Ds]
+    Eigen::MatrixXd Cell0DsCoordinates = {}; // coordinate vertici [3 x NumCell0Ds]
+    
 
 	//Cell1D
-    unsigned int NumCell1Ds = 0; ///< number of Cell1D
-    std::vector<unsigned int> Cell1DsId = {}; ///< Cell1D id, size 1 x NumberCell1D
-    Eigen::MatrixXi Cell1DsExtrema = {}; ///< Cell1D vertices indices, size 2 x NumberCell1D (fromId,toId)
-    // I marker servono?
-	// std::map<unsigned int, list<unsigned int>> MarkerCell1Ds = {}; ///< Cell1D properties
-
+    unsigned int NumCell1Ds = 0; //numero lati
+    std::vector<unsigned int> Cell1DsId = {}; // id dei lati [1 x NumCell1Ds]
+    Eigen::MatrixXi Cell1DsExtrema = {}; // id di partenza e arrivo dei lati,
+	                                     // ordinati sulle colonne per id [2 x NumCell1Ds]
+   
 	//Cell2D
-    unsigned int NumCell2Ds = 0; ///< number of Cell2D
-    std::vector<unsigned int> Cell2DsId = {}; ///< Cell2D id, size 1 x NumberCell2D
+    unsigned int NumCell2Ds = 0; // numero facce
+    std::vector<unsigned int> Cell2DsId = {}; // id delle facce [1 x NumCell2Ds]
 	std::vector<unsigned int> Cell2DsNumVert = {}; // vettore di interi positivi, ciascuno si riferisce al numero di vertici del poligono con id pari alla posizione nel vetore in questione
 	std::vector<unsigned int> Cell2DsNumEdg = {}; // vettore di interi positivi, ciascuno si riferisce al numero di edges del poligono con id pari alla posizione nel vetore in questione
-	std::vector<vector<unsigned int>> Cell2DsVertices = {}; // contiene gli id dei vertici dei poligoni, ordinatamente rispetto a come compaiono nel file csv
-    std::vector<vector<unsigned int>> Cell2DsEdges = {}; 
-	// I marker servono?
-	// std::map<unsigned int, list<unsigned int>> MarkerCell2Ds = {};
+	std::vector<vector<unsigned int>> Cell2DsVertices = {}; // contiene gli id dei vertici dei poligoni 
+    std::vector<vector<unsigned int>> Cell2DsEdges = {}; // contiene gli id dei lati dei poligoni 
 	
 	//Cell3D
-	unsigned int NumCell3Ds = 1;
-	unsigned int Cell3DsId; //(0=tetraedro, 1= ...)
-	/* alternativa, con id specifico per ogni poliedro 
-	std::vector<unsigned int> Cell3DsNumVert = {}; // indica il numero di vertici del poliedro identificato dalla posizione in questo vettore
-	std::vector<unsigned int> Cell3DsNumEdg = {};
-	std::vector<unsigned int> Cell3DsNumFaces = {};
-	*/
-	unsigned int Cell3DsNumVert =0;
-	unsigned int Cell3DsNumEdg =0;
-	unsigned int Cell3DsNumFaces =0;
+	unsigned int NumCell3Ds = 1; // nel nostro progetto sarà sempre 1
+	unsigned int Cell3DsId; 
+
+	unsigned int Cell3DsNumVert =0; // numero vertici del solido
+	unsigned int Cell3DsNumEdg =0; // numero lari del solido
+	unsigned int Cell3DsNumFaces =0; // numero facce del solido
+
+	vector<unsigned int> Cell3DsVertices = {}; // id vertici
+	vector<unsigned int> Cell3DsEdges = {}; // id lati
+	vector<unsigned int> Cell3DsFaces = {}; // id facce
 	
-	/*
-	std::vector<vector<unsigned int>> Cell3DsVertices = {}; 
-    std::vector<vector<unsigned int>> Cell3DsEdges = {}; 
-	std::vector<vector<unsigned int>> Cell3DsFaces = {}; 
-	*/
-	vector<unsigned int> Cell3DsVertices = {};
-	vector<unsigned int> Cell3DsEdges = {};
-	vector<unsigned int> Cell3DsFaces = {};
-	
-	
-	std::vector<int> Cell0DsShortPath;
-    std::vector<int> Cell1DsShortPath;
+	// PARAVIEW
+	std::vector<int> Cell0DsShortPath; // gli id dei vertici che fanno parte del cammino minimo valgono 1, gli altri zero
+    std::vector<int> Cell1DsShortPath; // gli id dei lati che fanno parte del cammino minimo valgono 1, gli altri zero
 	
 };
 
